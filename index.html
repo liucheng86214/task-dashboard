@@ -3,270 +3,258 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>✨ 工作任务看板</title>
+<title>工作任务看板</title>
 <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-:root {
-  --primary: #8B5CF6; --primary-light: #A78BFA; --secondary: #EC4899;
-  --success: #10B981; --warning: #F59E0B; --danger: #EF4444; --info: #3B82F6;
-  --bg: #F5F3FF; --card: #fff; --text: #1F2937; --muted: #6B7280; --border: #E5E7EB;
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --g1:#15803D; --g2:#16A34A; --g3:#22C55E; --g4:#86EFAC; --g5:#DCFCE7; --g6:#F0FDF4;
+  --text:#111827; --muted:#6B7280; --border:#D1FAE5; --card:#fff;
+  --s-pending:#F3F4F6; --s-pending-t:#4B5563;
+  --s-doing:#EFF6FF; --s-doing-t:#2563EB;
+  --s-done:#F0FDF4; --s-done-t:#15803D;
+  --s-blocked:#FFF1F2; --s-blocked-t:#BE123C;
 }
-body { font-family: -apple-system,'PingFang SC','Microsoft YaHei',sans-serif; background: linear-gradient(135deg,#F5F3FF 0%,#FCE7F3 50%,#EFF6FF 100%); min-height:100vh; color:var(--text); }
-.app { max-width:1200px; margin:0 auto; padding:24px 16px 120px; }
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:linear-gradient(150deg,#F0FDF4 0%,#F8FAFC 60%,#ECFDF5 100%);min-height:100vh;color:var(--text)}
+.app{max-width:1100px;margin:0 auto;padding:28px 16px 130px}
 
 /* Header */
-.header { text-align:center; margin-bottom:28px; }
-.header h1 { font-size:2rem; font-weight:800; background:linear-gradient(135deg,var(--primary),var(--secondary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-.header p { color:var(--muted); margin-top:6px; font-size:0.95rem; }
+.header{text-align:center;margin-bottom:28px}
+.header h1{font-size:1.7rem;font-weight:800;color:var(--g1);letter-spacing:-.5px}
+.header p{color:var(--muted);margin-top:5px;font-size:0.88rem}
 
 /* Card */
-.card { background:var(--card); border-radius:20px; padding:24px; box-shadow:0 4px 24px rgba(139,92,246,.10); margin-bottom:20px; }
+.card{background:var(--card);border-radius:16px;padding:22px;box-shadow:0 1px 8px rgba(21,128,61,.08);margin-bottom:18px;border:1px solid #E9F7EF}
 
 /* Stats */
-.stats-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:20px; }
-.stat-card { border-radius:16px; padding:18px 12px; text-align:center; color:#fff; position:relative; overflow:hidden; }
-.stat-card::after { content:''; position:absolute; top:-15px; right:-15px; width:70px; height:70px; border-radius:50%; background:rgba(255,255,255,.15); }
-.stat-card.s-total { background:linear-gradient(135deg,#8B5CF6,#7C3AED); }
-.stat-card.s-done { background:linear-gradient(135deg,#10B981,#059669); }
-.stat-card.s-doing { background:linear-gradient(135deg,#3B82F6,#2563EB); }
-.stat-card.s-blocked { background:linear-gradient(135deg,#EF4444,#DC2626); }
-.stat-card.s-overdue { background:linear-gradient(135deg,#F59E0B,#D97706); }
-.stat-num { font-size:2.2rem; font-weight:800; line-height:1; }
-.stat-label { font-size:0.8rem; opacity:.9; margin-top:5px; }
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}
+.stat-card{border-radius:12px;padding:16px 10px;text-align:center;color:#fff}
+.s-total  {background:#475569}
+.s-done   {background:#166534}
+.s-doing  {background:#1D4ED8}
+.s-blocked{background:#9F1239}
+.s-overdue{background:#92400E}
+.stat-num{font-size:2rem;font-weight:800;line-height:1}
+.stat-label{font-size:0.72rem;opacity:.85;margin-top:4px}
 
 /* Progress */
-.prog-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-.prog-rate { font-size:1.4rem; font-weight:800; background:linear-gradient(135deg,var(--primary),var(--secondary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-.prog-bar { background:#F3F4F6; border-radius:10px; height:10px; overflow:hidden; }
-.prog-fill { height:100%; border-radius:10px; background:linear-gradient(90deg,var(--primary),var(--secondary)); transition:width .6s ease; }
+.prog-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.prog-rate{font-size:1.2rem;font-weight:800;color:var(--g1)}
+.prog-bar{background:#E5E7EB;border-radius:8px;height:8px;overflow:hidden}
+.prog-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--g1),var(--g3));transition:width .6s ease}
+
+/* Section */
+.sec-title{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.row-between{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
 
 /* Table */
-.task-table { width:100%; border-collapse:collapse; }
-.task-table th { text-align:left; padding:11px 14px; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); border-bottom:2px solid var(--border); }
-.task-table td { padding:13px 14px; border-bottom:1px solid #F9FAFB; font-size:0.88rem; vertical-align:middle; }
-.task-table tr:hover td { background:#FAFAFA; }
+.task-table{width:100%;border-collapse:collapse}
+.task-table th{text-align:left;padding:9px 14px;font-size:0.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:1px solid #E5E7EB}
+.task-table td{padding:12px 14px;border-bottom:1px solid #F9FAFB;font-size:0.86rem;vertical-align:middle}
+.task-table tr:last-child td{border-bottom:none}
+.task-table tr:hover td{background:#FAFAFA}
 
 /* Badge */
-.badge { display:inline-flex; align-items:center; gap:3px; padding:3px 10px; border-radius:20px; font-size:0.76rem; font-weight:600; cursor:pointer; white-space:nowrap; }
-.b-pending { background:#F3F4F6; color:#6B7280; }
-.b-in-progress { background:#EFF6FF; color:#2563EB; }
-.b-completed { background:#ECFDF5; color:#059669; }
-.b-blocked { background:#FEF2F2; color:#DC2626; }
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:6px;font-size:0.74rem;font-weight:600;cursor:pointer;white-space:nowrap;border:1px solid transparent}
+.b-pending  {background:var(--s-pending);color:var(--s-pending-t);border-color:#D1D5DB}
+.b-in-progress{background:var(--s-doing);color:var(--s-doing-t);border-color:#BFDBFE}
+.b-completed{background:var(--s-done);color:var(--s-done-t);border-color:#BBF7D0}
+.b-blocked  {background:var(--s-blocked);color:var(--s-blocked-t);border-color:#FECDD3}
 
 /* Priority */
-.p-high { color:var(--danger); font-weight:700; }
-.p-mid { color:var(--warning); font-weight:700; }
-.p-low { color:var(--success); font-weight:700; }
+.p-high{color:#B91C1C;font-weight:700;font-size:.82rem}
+.p-mid {color:#B45309;font-weight:700;font-size:.82rem}
+.p-low {color:#166534;font-weight:700;font-size:.82rem}
 
-/* Form */
-.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-.full { grid-column:1/-1; }
-.fg { display:flex; flex-direction:column; gap:5px; }
-.fg label { font-size:0.82rem; font-weight:700; color:var(--muted); }
-.fg input,.fg select,.fg textarea { padding:9px 13px; border:2px solid var(--border); border-radius:10px; font-size:0.92rem; font-family:inherit; background:#fff; transition:border-color .2s; }
-.fg input:focus,.fg select:focus,.fg textarea:focus { outline:none; border-color:var(--primary); }
-.fg textarea { resize:vertical; min-height:72px; }
-.file-zone { border:2px dashed #A78BFA; border-radius:10px; padding:18px; text-align:center; cursor:pointer; background:#FAF8FF; transition:background .2s; }
-.file-zone:hover { background:#F3EEFF; }
-.file-tag { display:inline-flex; align-items:center; gap:3px; background:#EFF6FF; color:#2563EB; padding:3px 9px; border-radius:6px; font-size:0.75rem; margin:3px; }
+/* Task name cell */
+.task-name{font-weight:600;color:var(--text)}
+.task-sub{font-size:.74rem;margin-top:2px;color:var(--muted)}
+.task-block{font-size:.74rem;margin-top:2px;color:#BE123C}
+
+/* Assignee chip */
+.chip{background:#F0FDF4;color:var(--g1);padding:2px 8px;border-radius:5px;font-size:.8rem;font-weight:600;border:1px solid #BBF7D0}
+
+/* Overdue */
+.ov{display:inline-block;padding:1px 5px;background:#FEF3C7;color:#92400E;border-radius:4px;font-size:.68rem;font-weight:700;margin-left:5px}
+
+/* File */
+.file-tag{display:inline-flex;align-items:center;gap:2px;background:#EFF6FF;color:#1D4ED8;padding:2px 7px;border-radius:5px;font-size:.72rem;margin:2px;border:1px solid #BFDBFE}
 
 /* Buttons */
-.btn { padding:9px 18px; border-radius:10px; border:none; cursor:pointer; font-size:0.88rem; font-weight:600; font-family:inherit; transition:all .2s; }
-.btn-primary { background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; }
-.btn-primary:hover { transform:translateY(-1px); box-shadow:0 4px 15px rgba(139,92,246,.4); }
-.btn-ghost { background:#F3F4F6; color:var(--muted); }
-.btn-ghost:hover { background:#E5E7EB; }
-.btn-del { background:#FEF2F2; color:var(--danger); }
-.btn-sm { padding:5px 11px; font-size:0.78rem; }
-.add-btn { display:flex; align-items:center; gap:6px; background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; border:none; border-radius:50px; padding:11px 26px; font-size:0.95rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all .2s; }
-.add-btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(139,92,246,.4); }
+.btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-size:.85rem;font-weight:600;font-family:inherit;transition:all .15s}
+.btn-primary{background:var(--g2);color:#fff}
+.btn-primary:hover{background:var(--g1);transform:translateY(-1px)}
+.btn-ghost{background:#F3F4F6;color:var(--muted)}
+.btn-ghost:hover{background:#E5E7EB}
+.btn-del{background:#FFF1F2;color:#BE123C}
+.btn-del:hover{background:#FFE4E6}
+.btn-sm{padding:4px 10px;font-size:.75rem}
+.add-btn{display:flex;align-items:center;gap:6px;background:var(--g2);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.add-btn:hover{background:var(--g1)}
+
+/* Form */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.full{grid-column:1/-1}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg label{font-size:.78rem;font-weight:700;color:var(--muted)}
+.fg input,.fg select,.fg textarea{padding:8px 12px;border:1.5px solid #D1D5DB;border-radius:8px;font-size:.9rem;font-family:inherit;background:#fff;transition:border-color .15s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--g3)}
+.fg textarea{resize:vertical;min-height:68px}
+.file-zone{border:1.5px dashed var(--g4);border-radius:8px;padding:16px;text-align:center;cursor:pointer;background:var(--g6);transition:background .15s}
+.file-zone:hover{background:#DCFCE7}
 
 /* Modal */
-.overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center; z-index:2000; backdrop-filter:blur(4px); }
-.modal { background:#fff; border-radius:24px; padding:28px; width:92%; max-width:620px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.2); }
-.modal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; }
-.modal-head h2 { font-size:1.25rem; font-weight:800; background:linear-gradient(135deg,var(--primary),var(--secondary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-.modal-foot { display:flex; justify-content:flex-end; gap:10px; margin-top:22px; }
-
-/* Section title */
-.sec-title { font-size:1.05rem; font-weight:700; margin-bottom:16px; display:flex; align-items:center; gap:6px; }
-.row-between { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:2000;backdrop-filter:blur(3px)}
+.modal{background:#fff;border-radius:18px;padding:26px;width:92%;max-width:600px;max-height:90vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.16)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-head h2{font-size:1.1rem;font-weight:800;color:var(--g1)}
+.modal-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
 
 /* Chart */
-.chart-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
-.chart-legend { display:flex; flex-direction:column; gap:10px; }
-.leg-item { display:flex; align-items:center; gap:8px; font-size:0.85rem; }
-.leg-dot { width:11px; height:11px; border-radius:50%; flex-shrink:0; }
-.leg-count { margin-left:auto; font-weight:700; color:var(--text); padding-left:16px; }
-
-/* Priority bars */
-.pri-bar-wrap { margin-bottom:14px; }
-.pri-bar-label { display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.83rem; }
-.pri-bar-bg { background:#F3F4F6; border-radius:6px; height:8px; overflow:hidden; }
-.pri-bar-fill { height:100%; border-radius:6px; transition:width .5s ease; }
-
-/* Overdue tag */
-.ov-tag { display:inline-block; padding:1px 6px; background:#FEF3C7; color:#D97706; border-radius:4px; font-size:0.7rem; font-weight:700; margin-left:5px; }
-
-/* Quick summary box */
-.summary-box { background:#F9F7FF; border-radius:12px; padding:14px; border:1px solid #E9D5FF; margin-top:18px; }
-.summary-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
-.summary-cell { text-align:center; background:#fff; border-radius:8px; padding:10px; }
-.summary-num { font-size:1.4rem; font-weight:800; }
-.summary-label { font-size:0.72rem; color:#9CA3AF; }
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.chart-legend{display:flex;flex-direction:column;gap:10px}
+.leg-item{display:flex;align-items:center;gap:8px;font-size:.83rem}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.leg-count{margin-left:auto;font-weight:700;color:var(--text);padding-left:16px}
+.pri-bar-wrap{margin-bottom:12px}
+.pri-bar-label{display:flex;justify-content:space-between;margin-bottom:4px;font-size:.8rem}
+.pri-bar-bg{background:#F3F4F6;border-radius:5px;height:7px;overflow:hidden}
+.pri-bar-fill{height:100%;border-radius:5px;transition:width .5s ease}
+.summary-box{background:var(--g6);border-radius:10px;padding:14px;border:1px solid var(--border);margin-top:16px}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.summary-cell{text-align:center;background:#fff;border-radius:8px;padding:9px;border:1px solid #E5E7EB}
+.summary-num{font-size:1.3rem;font-weight:800}
+.summary-lbl{font-size:.7rem;color:#9CA3AF}
 
 /* Empty */
-.empty { text-align:center; padding:50px 20px; color:var(--muted); }
-.empty .e-icon { font-size:3rem; margin-bottom:10px; }
+.empty{text-align:center;padding:48px 20px;color:var(--muted)}
 
 /* Toast */
-@keyframes slideIn { from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
-.toast { position:fixed; top:20px; right:20px; z-index:9999; padding:12px 20px; border-radius:12px; background:#fff; box-shadow:0 8px 30px rgba(0,0,0,.15); display:flex; align-items:center; gap:8px; animation:slideIn .3s ease; font-size:0.88rem; font-weight:600; border-left:4px solid var(--success); }
+@keyframes slideIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast{position:fixed;top:18px;right:18px;z-index:9999;padding:11px 18px;border-radius:10px;background:#fff;box-shadow:0 6px 24px rgba(0,0,0,.12);display:flex;align-items:center;gap:7px;animation:slideIn .25s ease;font-size:.85rem;font-weight:600;border-left:3px solid var(--g2)}
 
-/* ===== AVATAR ===== */
-@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-@keyframes blink { 0%,88%,100%{transform:scaleY(1)} 93%{transform:scaleY(0.08)} }
-@keyframes ripple { 0%{transform:scale(.8);opacity:1} 100%{transform:scale(2.2);opacity:0} }
-@keyframes talking { 0%,100%{height:8px} 50%{height:14px;width:22px} }
-@keyframes bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+/* ========= ROBOT AVATAR ========= */
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes eyepulse{0%,100%{box-shadow:0 0 5px #4ADE80}50%{box-shadow:0 0 14px #22C55E,0 0 4px #fff}}
+@keyframes blink{0%,88%,100%{transform:scaleY(1)}93%{transform:scaleY(0.08)}}
+@keyframes robotalk{0%,100%{height:5px;width:28px}50%{height:11px;width:26px;border-radius:3px}}
+@keyframes ripple{0%{transform:scale(.8);opacity:1}100%{transform:scale(2.3);opacity:0}}
+@keyframes antglow{0%,100%{box-shadow:0 0 6px #4ADE80}50%{box-shadow:0 0 16px #22C55E}}
+@keyframes ledflash{0%,100%{opacity:1}50%{opacity:.3}}
 
-.av-wrap { position:fixed; bottom:28px; right:28px; z-index:1000; cursor:pointer; user-select:none; }
-.av-bubble { position:absolute; bottom:125px; right:0; background:#fff; border-radius:16px 16px 0 16px; padding:11px 14px; width:190px; font-size:0.82rem; line-height:1.5; color:var(--text); box-shadow:0 6px 24px rgba(0,0,0,.12); border:2px solid #E9D5FF; animation:float 3s ease-in-out infinite; }
-.av-ripple { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:110px; height:110px; border-radius:50%; background:rgba(139,92,246,.25); animation:ripple 1.5s ease-out infinite; pointer-events:none; }
-.av-char { width:100px; height:110px; position:relative; animation:float 3s ease-in-out infinite; filter:drop-shadow(0 8px 20px rgba(139,92,246,.3)); }
+.av-wrap{position:fixed;bottom:26px;right:26px;z-index:1000;cursor:pointer;user-select:none}
+.av-bubble{position:absolute;bottom:128px;right:0;background:#fff;border-radius:14px 14px 0 14px;padding:10px 13px;width:175px;font-size:.78rem;line-height:1.5;color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.1);border:1.5px solid #BBF7D0;animation:float 3s ease-in-out infinite}
+.av-ripple{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:108px;height:108px;border-radius:50%;background:rgba(34,197,94,.2);animation:ripple 1.4s ease-out infinite;pointer-events:none}
+.av-robot{width:90px;height:108px;position:relative;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 8px 18px rgba(22,163,74,.25))}
 
-/* Body/dress */
-.av-body { position:absolute; bottom:0; left:12px; width:76px; height:36px; background:linear-gradient(145deg,#CE93D8,#AB47BC); border-radius:0 0 18px 18px; }
-.av-body::before { content:''; position:absolute; top:-8px; left:-4px; right:-4px; height:18px; background:linear-gradient(145deg,#BA68C8,#9C27B0); border-radius:50% 50% 0 0; }
+/* Antenna */
+.av-ant{position:absolute;top:0;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center}
+.av-ant-stick{width:3px;height:14px;background:#6EE7B7;border-radius:2px}
+.av-ant-ball{width:10px;height:10px;border-radius:50%;background:#22C55E;margin-top:-1px;animation:antglow 2s ease-in-out infinite}
 
 /* Head */
-.av-head { position:absolute; top:10px; left:8px; width:84px; height:82px; background:linear-gradient(145deg,#FFDDE6,#FFC2D4); border-radius:50%; }
+.av-head{position:absolute;top:12px;left:5px;width:80px;height:62px;background:linear-gradient(145deg,#F0FDF4,#DCFCE7);border-radius:14px;border:2px solid #6EE7B7}
 
-/* Hair top */
-.av-hair-top { position:absolute; top:4px; left:8px; width:84px; height:44px; background:linear-gradient(145deg,#5D4037,#6D4C41); border-radius:42px 42px 0 0; z-index:2; }
-/* Side hair */
-.av-hair-l { position:absolute; top:24px; left:6px; width:18px; height:44px; background:#5D4037; border-radius:0 0 14px 14px; z-index:1; }
-.av-hair-r { position:absolute; top:24px; right:6px; width:18px; height:44px; background:#5D4037; border-radius:0 0 14px 14px; z-index:1; }
-
-/* Ears */
-.av-ear-l { position:absolute; top:30px; left:4px; width:18px; height:18px; background:#FFDDE6; border-radius:50%; z-index:0; }
-.av-ear-r { position:absolute; top:30px; right:4px; width:18px; height:18px; background:#FFDDE6; border-radius:50%; z-index:0; }
+/* Bolts */
+.av-bolt{position:absolute;top:50%;transform:translateY(-50%);width:8px;height:8px;background:#9CA3AF;border-radius:50%;border:1px solid #D1D5DB}
+.av-bolt.l{left:-5px}
+.av-bolt.r{right:-5px}
 
 /* Eyes */
-.av-eyes { position:absolute; top:30px; left:50%; transform:translateX(-50%); display:flex; gap:16px; z-index:3; animation:blink 4.5s ease-in-out infinite; }
-.av-eye { width:13px; height:13px; background:#3E2723; border-radius:50%; position:relative; }
-.av-eye::after { content:''; width:4px; height:4px; background:#fff; border-radius:50%; position:absolute; top:2px; right:2px; }
-
-/* Cheeks */
-.av-cheeks { position:absolute; top:46px; left:50%; transform:translateX(-50%); display:flex; gap:28px; z-index:3; }
-.av-cheek { width:13px; height:7px; background:rgba(255,100,130,.38); border-radius:50%; }
+.av-eyes{position:absolute;top:16px;left:50%;transform:translateX(-50%);display:flex;gap:16px;animation:blink 5s ease-in-out infinite}
+.av-eye{width:18px;height:18px;background:#1a2e1f;border-radius:4px;display:flex;align-items:center;justify-content:center}
+.av-eye-led{width:10px;height:10px;background:#4ADE80;border-radius:50%;animation:eyepulse 2s ease-in-out infinite}
 
 /* Mouth */
-.av-mouth { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); width:18px; height:8px; border-bottom:3px solid #E91E63; border-radius:0 0 18px 18px; z-index:3; transition:height .1s; }
-.av-mouth.talking { animation:talking .18s ease-in-out infinite; }
+.av-mouth-bar{position:absolute;bottom:11px;left:50%;transform:translateX(-50%);width:28px;height:5px;background:#16A34A;border-radius:3px}
+.av-mouth-bar.talking{animation:robotalk .14s ease-in-out infinite}
 
-/* Bow */
-.av-bow { position:absolute; top:6px; right:8px; z-index:4; font-size:1rem; }
+/* Screen (between eyes and mouth) */
+.av-screen{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);font-size:10px;color:#16A34A;font-weight:700;letter-spacing:1px;opacity:.7}
 
-/* Ahoge (hair strand) */
-.av-ahoge { position:absolute; top:0px; left:44px; width:8px; height:20px; background:#6D4C41; border-radius:4px; transform:rotate(15deg); transform-origin:bottom center; z-index:3; }
+/* Body */
+.av-body{position:absolute;bottom:0;left:11px;width:68px;height:36px;background:linear-gradient(145deg,#DCFCE7,#BBF7D0);border-radius:10px;border:2px solid #6EE7B7}
+.av-panel{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;gap:5px;align-items:center}
+.av-led{width:7px;height:7px;border-radius:50%}
+.av-led.g{background:#22C55E;animation:ledflash 1.2s ease-in-out infinite}
+.av-led.y{background:#FCD34D;animation:ledflash 1.8s ease-in-out infinite .4s}
+.av-led.r{background:#F87171;animation:ledflash 2.4s ease-in-out infinite .8s}
 
-@media(max-width:768px) {
-  .app { padding:16px 12px 130px; }
-  .header h1 { font-size:1.5rem; }
-  .header p { font-size:0.82rem; }
-  .stats-grid { grid-template-columns:repeat(3,1fr); gap:10px; }
-  .stat-num { font-size:1.8rem; }
-  .stat-label { font-size:0.72rem; }
-  .card { padding:16px; border-radius:16px; }
-  .chart-grid { grid-template-columns:1fr; }
-  .task-table { display:none; }
-  .mobile-cards { display:block!important; }
-  .form-grid { grid-template-columns:1fr; }
-  .row-between { flex-direction:column; align-items:stretch; gap:10px; }
-  .add-btn { width:100%; justify-content:center; }
-  .sec-title { margin-bottom:4px; }
-  .overlay { align-items:flex-end; }
-  .modal { border-radius:24px 24px 0 0; max-height:92vh; width:100%; max-width:100%; }
-  .av-wrap { bottom:16px; right:16px; }
-  .av-bubble { width:155px; font-size:0.76rem; padding:9px 11px; bottom:110px; }
-  .av-char { width:84px; height:92px; }
-  .av-head { width:70px; height:68px; top:8px; left:7px; }
-  .av-hair-top { width:70px; height:37px; top:3px; left:7px; }
-  .av-hair-l { top:20px; left:5px; width:15px; height:37px; }
-  .av-hair-r { top:20px; right:5px; width:15px; height:37px; }
-  .av-body { width:63px; height:30px; left:10px; }
-  .av-eyes { top:25px; gap:13px; }
-  .av-eye { width:11px; height:11px; }
-  .av-cheeks { top:38px; gap:22px; }
-  .av-mouth { bottom:13px; }
-  .av-ahoge { left:37px; }
+/* Mobile */
+@media(max-width:768px){
+  .app{padding:14px 11px 130px}
+  .header h1{font-size:1.3rem}
+  .stats-grid{grid-template-columns:repeat(3,1fr);gap:9px}
+  .stat-num{font-size:1.6rem}
+  .stat-label{font-size:.68rem}
+  .card{padding:14px;border-radius:13px}
+  .chart-grid{grid-template-columns:1fr}
+  .task-table{display:none}
+  .mobile-cards{display:block!important}
+  .form-grid{grid-template-columns:1fr}
+  .row-between{flex-direction:column;align-items:stretch;gap:10px}
+  .add-btn{justify-content:center}
+  .overlay{align-items:flex-end}
+  .modal{border-radius:18px 18px 0 0;max-height:93vh;width:100%;max-width:100%}
+  .av-wrap{bottom:14px;right:14px}
+  .av-bubble{width:155px;font-size:.74rem;bottom:115px}
 }
-@media(max-width:420px) {
-  .stats-grid { grid-template-columns:repeat(2,1fr); }
+@media(max-width:420px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
 }
-.mobile-cards { display:none; }
-.m-card { background:#fff; border-radius:12px; padding:14px; margin-bottom:10px; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+.mobile-cards{display:none}
+.m-card{background:#fff;border-radius:11px;padding:13px;margin-bottom:9px;box-shadow:0 1px 6px rgba(0,0,0,.06);border:1px solid #F3F4F6}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useEffect, useRef } = React;
+const {useState,useEffect,useRef}=React;
 
-const DEMO = [
-  { id:1, name:'完成Q1季度报告', assignee:'张三', deadline:'2026-03-31', priority:'high', status:'in-progress', blocker:'', files:['Q1草稿.docx'], notes:'需要包含销售数据和市场分析', createdAt:'2026-03-20' },
-  { id:2, name:'产品原型设计评审', assignee:'李四', deadline:'2026-03-28', priority:'mid', status:'completed', blocker:'', files:['prototype_v2.fig'], notes:'已完成3轮修改，获得团队认可', createdAt:'2026-03-18' },
-  { id:3, name:'后端API性能优化', assignee:'王五', deadline:'2026-04-05', priority:'high', status:'blocked', blocker:'等待DBA团队提供数据库优化方案，预计明天到位', files:[], notes:'接口响应时间需从2s降至500ms', createdAt:'2026-03-22' },
-  { id:4, name:'新员工培训材料整理', assignee:'赵六', deadline:'2026-04-10', priority:'low', status:'pending', blocker:'', files:[], notes:'包含公司文化、流程规范、工具使用说明', createdAt:'2026-03-24' },
+const DEMO=[
+  {id:1,name:'完成Q1季度报告',assignee:'张三',deadline:'2026-03-31',priority:'high',status:'in-progress',blocker:'',files:['Q1草稿.docx'],notes:'需要包含销售数据和市场分析',createdAt:'2026-03-20'},
+  {id:2,name:'产品原型设计评审',assignee:'李四',deadline:'2026-03-28',priority:'mid',status:'completed',blocker:'',files:['prototype_v2.fig'],notes:'已完成3轮修改，获得团队认可',createdAt:'2026-03-18'},
+  {id:3,name:'后端API性能优化',assignee:'王五',deadline:'2026-04-05',priority:'high',status:'blocked',blocker:'等待DBA团队提供数据库优化方案，预计明天到位',files:[],notes:'接口响应时间需从2s降至500ms',createdAt:'2026-03-22'},
+  {id:4,name:'新员工培训材料整理',assignee:'赵六',deadline:'2026-04-10',priority:'low',status:'pending',blocker:'',files:[],notes:'包含公司文化、流程规范、工具使用说明',createdAt:'2026-03-24'},
 ];
 
-const S = {
-  'pending':     { label:'未开始', cls:'b-pending',     emoji:'⏳' },
-  'in-progress': { label:'进行中', cls:'b-in-progress', emoji:'🔄' },
-  'completed':   { label:'已完成', cls:'b-completed',   emoji:'✅' },
-  'blocked':     { label:'已卡点', cls:'b-blocked',     emoji:'🚧' },
+const S={
+  'pending':     {label:'未开始',cls:'b-pending',    emoji:'⏳'},
+  'in-progress': {label:'进行中',cls:'b-in-progress',emoji:'🔄'},
+  'completed':   {label:'已完成',cls:'b-completed',  emoji:'✅'},
+  'blocked':     {label:'已卡点',cls:'b-blocked',    emoji:'🚧'},
 };
-const P = {
-  'high': { label:'高', cls:'p-high', emoji:'🔴' },
-  'mid':  { label:'中', cls:'p-mid',  emoji:'🟡' },
-  'low':  { label:'低', cls:'p-low',  emoji:'🟢' },
-};
-const SCYCLE = ['pending','in-progress','completed','blocked'];
-const SCOLORS = { pending:'#9CA3AF', 'in-progress':'#3B82F6', completed:'#10B981', blocked:'#EF4444' };
+const P={high:{label:'高',cls:'p-high',e:'↑'},mid:{label:'中',cls:'p-mid',e:'—'},low:{label:'低',cls:'p-low',e:'↓'}};
+const SCYCLE=['pending','in-progress','completed','blocked'];
+const SCOL={pending:'#9CA3AF','in-progress':'#3B82F6',completed:'#16A34A',blocked:'#E11D48'};
 
-/* ---- Donut Chart ---- */
-function Donut({ tasks }) {
-  const counts = { pending:0, 'in-progress':0, completed:0, blocked:0 };
-  tasks.forEach(t => counts[t.status] = (counts[t.status]||0)+1);
-  const total = tasks.length || 1;
-  const sz = 130, r = 48, cx = sz/2, cy = sz/2, circ = 2*Math.PI*r;
-  let off = 0;
-  const segs = Object.entries(counts).map(([k,v]) => {
-    const pct = v/total, d = pct*circ, g = circ-d, o = off*circ;
-    off += pct;
-    return { k, v, color:SCOLORS[k], d, g, o };
+/* Donut */
+function Donut({tasks}){
+  const cnt={pending:0,'in-progress':0,completed:0,blocked:0};
+  tasks.forEach(t=>cnt[t.status]=(cnt[t.status]||0)+1);
+  const total=tasks.length||1,sz=126,r=46,cx=sz/2,cy=sz/2,circ=2*Math.PI*r;
+  let off=0;
+  const segs=Object.entries(cnt).map(([k,v])=>{
+    const pct=v/total,d=pct*circ,g=circ-d,o=off*circ;
+    off+=pct; return {k,v,color:SCOL[k],d,g,o};
   });
-  return (
-    <div style={{display:'flex',alignItems:'center',gap:24,flexWrap:'wrap'}}>
+  return(
+    <div style={{display:'flex',alignItems:'center',gap:22,flexWrap:'wrap'}}>
       <svg width={sz} height={sz}>
-        {total===1 && tasks.length===0 ? (
-          <circle cx={cx} cy={cy} r={r} fill="none" stroke="#E5E7EB" strokeWidth={18}/>
-        ) : segs.map(s=>(
-          <circle key={s.k} cx={cx} cy={cy} r={r} fill="none" stroke={s.color} strokeWidth={18}
-            strokeDasharray={`${s.d} ${s.g}`} strokeDashoffset={-s.o}
-            transform={`rotate(-90 ${cx} ${cy})`} style={{transition:'stroke-dasharray .5s'}}/>
-        ))}
-        <text x={cx} y={cy-7} textAnchor="middle" fontSize="20" fontWeight="800" fill="#1F2937">{tasks.length}</text>
-        <text x={cx} y={cy+12} textAnchor="middle" fontSize="10" fill="#9CA3AF">任务总数</text>
+        {tasks.length===0
+          ?<circle cx={cx} cy={cy} r={r} fill="none" stroke="#E5E7EB" strokeWidth={16}/>
+          :segs.map(s=><circle key={s.k} cx={cx} cy={cy} r={r} fill="none" stroke={s.color} strokeWidth={16}
+              strokeDasharray={`${s.d} ${s.g}`} strokeDashoffset={-s.o}
+              transform={`rotate(-90 ${cx} ${cy})`} style={{transition:'stroke-dasharray .5s'}}/>)}
+        <text x={cx} y={cy-5} textAnchor="middle" fontSize="19" fontWeight="800" fill="#111827">{tasks.length}</text>
+        <text x={cx} y={cy+11} textAnchor="middle" fontSize="9" fill="#9CA3AF">总任务数</text>
       </svg>
       <div className="chart-legend">
-        {Object.entries(counts).map(([k,v])=>(
+        {Object.entries(cnt).map(([k,v])=>(
           <div key={k} className="leg-item">
-            <div className="leg-dot" style={{background:SCOLORS[k]}}/>
+            <div className="leg-dot" style={{background:SCOL[k]}}/>
             <span style={{color:'#6B7280'}}>{S[k].label}</span>
             <span className="leg-count">{v}</span>
           </div>
@@ -276,162 +264,125 @@ function Donut({ tasks }) {
   );
 }
 
-/* ---- Avatar ---- */
-function Avatar({ tasks }) {
-  const [talking, setTalking] = useState(false);
-  const [ripple, setRipple] = useState(false);
-  const [bubble, setBubble] = useState('点我听工作汇报~ 🌸');
+/* Robot Avatar */
+function Avatar({tasks}){
+  const [talking,setTalking]=useState(false);
+  const [ripple,setRipple]=useState(false);
+  const [bubble,setBubble]=useState('点我听工作汇报 🤖');
 
-  const genReport = () => {
-    const total = tasks.length;
-    if (!total) return '老板好！目前还没有任务哦，快去添加任务吧！我随时待命！';
-    const done = tasks.filter(t=>t.status==='completed').length;
-    const doing = tasks.filter(t=>t.status==='in-progress').length;
-    const blocked = tasks.filter(t=>t.status==='blocked').length;
-    const pending = tasks.filter(t=>t.status==='pending').length;
-    const rate = Math.round(done/total*100);
-    const today = new Date(); today.setHours(0,0,0,0);
-    const overdue = tasks.filter(t=>t.status!=='completed'&&t.deadline&&new Date(t.deadline)<today);
-    let r = `老板您好！我来汇报工作进展啦！目前共有${total}个任务，整体完成率${rate}%。`;
-    r += `已完成${done}个，进行中${doing}个，未开始${pending}个。`;
-    if (blocked>0) {
-      r += `有${blocked}个任务遇到卡点，需要关注。`;
+  const genReport=()=>{
+    const total=tasks.length;
+    if(!total) return '老板好，目前暂无任务，可以点击新建任务开始工作规划。';
+    const done=tasks.filter(t=>t.status==='completed').length;
+    const doing=tasks.filter(t=>t.status==='in-progress').length;
+    const blocked=tasks.filter(t=>t.status==='blocked').length;
+    const pending=tasks.filter(t=>t.status==='pending').length;
+    const rate=Math.round(done/total*100);
+    const today=new Date();today.setHours(0,0,0,0);
+    const overdue=tasks.filter(t=>t.status!=='completed'&&t.deadline&&new Date(t.deadline)<today);
+
+    let r=`老板，您好。以下是当前工作进度汇报。共有${total}项任务，整体完成率${rate}%。`;
+    r+=`其中已完成${done}项，进行中${doing}项，未开始${pending}项。`;
+    if(blocked>0){
+      r+=`有${blocked}项任务存在卡点，请重点关注。`;
       tasks.filter(t=>t.status==='blocked').forEach(t=>{
-        r += `任务"${t.name}"卡点原因：${t.blocker||'暂未说明'}。`;
+        if(t.blocker) r+=`"${t.name}"的卡点为：${t.blocker}。`;
+        else r+=`"${t.name}"卡点原因待补充。`;
       });
     }
-    if (overdue.length>0) r += `另外有${overdue.length}个任务已超期，请老板重点关注！`;
-    r += rate===100?'所有任务全部完成，团队表现超棒！':rate>=70?'整体进展顺利，请老板放心！':rate>=40?'部分任务仍在推进，团队很努力的！':'任务还挺多的，团队会加油的，请老板放心！';
+    if(overdue.length>0) r+=`另有${overdue.length}项任务已逾期，建议及时跟进。`;
+    if(rate===100) r+='所有任务均已完成，团队工作推进顺利。';
+    else if(rate>=70) r+='整体进展正常，请放心。';
+    else if(rate>=40) r+='多数任务仍在推进中，团队正在努力跟进。';
+    else r+='任务较多，团队会加快推进节奏。';
     return r;
   };
 
-  const speak = () => {
-    if (!('speechSynthesis' in window)) { setBubble('浏览器不支持语音呢😅'); return; }
+  const speak=()=>{
+    if(!('speechSynthesis' in window)){setBubble('浏览器不支持语音功能');return;}
     window.speechSynthesis.cancel();
-    const text = genReport();
-    const total = tasks.length;
-    const done = tasks.filter(t=>t.status==='completed').length;
-    setBubble(total===0?'还没有任务，快去添加吧！':`共${total}个任务，完成率${total?Math.round(done/total*100):0}% 🌸`);
-    setTalking(true); setRipple(true);
-    const utt = new SpeechSynthesisUtterance(text);
-    utt.lang='zh-CN'; utt.rate=1.0; utt.pitch=1.6; utt.volume=1;
-    const voices = window.speechSynthesis.getVoices();
-    const v = voices.find(v=>v.lang.startsWith('zh')&&(v.name.includes('Ting')||v.name.includes('女')||v.name.includes('Female')))
-           || voices.find(v=>v.lang.startsWith('zh'));
-    if (v) utt.voice=v;
-    utt.onend=()=>{ setTalking(false); setRipple(false); setBubble('汇报完毕！有问题随时点我 💕'); setTimeout(()=>setBubble('点我听工作汇报~ 🌸'),3000); };
+    const text=genReport();
+    const total=tasks.length;
+    const done=tasks.filter(t=>t.status==='completed').length;
+    const rate=total?Math.round(done/total*100):0;
+    setBubble(total===0?'暂无任务，请添加 📋':`${total}项任务 · 完成率${rate}%`);
+    setTalking(true);setRipple(true);
+    const utt=new SpeechSynthesisUtterance(text);
+    utt.lang='zh-CN';utt.rate=1.05;utt.pitch=1.1;utt.volume=1;
+    const voices=window.speechSynthesis.getVoices();
+    const v=voices.find(v=>v.lang.startsWith('zh')&&(v.name.includes('Ting')||v.name.includes('女')||v.name.includes('Female')||v.name.includes('Xiao')))
+          ||voices.find(v=>v.lang.startsWith('zh'));
+    if(v) utt.voice=v;
+    utt.onend=()=>{setTalking(false);setRipple(false);setBubble('汇报完毕，随时待命 ✅');setTimeout(()=>setBubble('点我听工作汇报 🤖'),3000);};
     window.speechSynthesis.speak(utt);
   };
 
-  return (
-    <div className="av-wrap" onClick={speak} title="点我听工作汇报">
+  return(
+    <div className="av-wrap" onClick={speak} title="点击收听工作汇报">
       <div className="av-bubble">{bubble}</div>
-      {ripple && <div className="av-ripple"/>}
-      <div className="av-char">
-        <div className="av-hair-l"/><div className="av-hair-r"/>
+      {ripple&&<div className="av-ripple"/>}
+      <div className="av-robot">
+        {/* Antenna */}
+        <div className="av-ant"><div className="av-ant-ball"/><div className="av-ant-stick"/></div>
+        {/* Head */}
         <div className="av-head">
-          <div className="av-ear-l"/><div className="av-ear-r"/>
-          <div className="av-hair-top"/>
-          <div className="av-ahoge"/>
-          <div className="av-eyes"><div className="av-eye"/><div className="av-eye"/></div>
-          <div className="av-cheeks"><div className="av-cheek"/><div className="av-cheek"/></div>
-          <div className={`av-mouth${talking?' talking':''}`}/>
-          <div className="av-bow">🎀</div>
+          <div className="av-bolt l"/><div className="av-bolt r"/>
+          <div className="av-eyes"><div className="av-eye"><div className="av-eye-led"/></div><div className="av-eye"><div className="av-eye-led"/></div></div>
+          <div className="av-screen">{talking?'...':'OK'}</div>
+          <div className={`av-mouth-bar${talking?' talking':''}`}/>
         </div>
-        <div className="av-body"/>
+        {/* Body */}
+        <div className="av-body">
+          <div className="av-panel"><div className="av-led g"/><div className="av-led y"/><div className="av-led r"/></div>
+        </div>
       </div>
     </div>
   );
 }
 
-/* ---- Task Form ---- */
-function TaskForm({ task, onSave, onClose }) {
-  const [f, setF] = useState(task||{ name:'',assignee:'',deadline:'',priority:'mid',status:'pending',blocker:'',files:[],notes:'' });
-  const fileRef = useRef(null);
-  const set = (k,v) => setF(p=>({...p,[k]:v}));
-
-  const onFile = e => {
-    const names = Array.from(e.target.files).map(x=>x.name);
-    setF(p=>({...p,files:[...p.files,...names]}));
-  };
-
-  const submit = e => {
-    e.preventDefault();
-    if (!f.name.trim()) return;
-    onSave({...f, id:task?.id||Date.now(), createdAt:task?.createdAt||new Date().toISOString().split('T')[0]});
-  };
-
-  return (
+/* Task Form */
+function TaskForm({task,onSave,onClose}){
+  const [f,setF]=useState(task||{name:'',assignee:'',deadline:'',priority:'mid',status:'pending',blocker:'',files:[],notes:''});
+  const fileRef=useRef(null);
+  const set=(k,v)=>setF(p=>({...p,[k]:v}));
+  const onFile=e=>{const ns=Array.from(e.target.files).map(x=>x.name);setF(p=>({...p,files:[...p.files,...ns]}));};
+  const submit=e=>{e.preventDefault();if(!f.name.trim())return;onSave({...f,id:task?.id||Date.now(),createdAt:task?.createdAt||new Date().toISOString().split('T')[0]});};
+  return(
     <div className="overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
       <div className="modal">
         <div className="modal-head">
-          <h2>{task?'✏️ 编辑任务':'✨ 新建任务'}</h2>
+          <h2>{task?'编辑任务':'新建任务'}</h2>
           <button className="btn btn-ghost btn-sm" onClick={onClose}>✕</button>
         </div>
         <form onSubmit={submit}>
           <div className="form-grid">
-            <div className="fg full">
-              <label>任务名称 *</label>
-              <input type="text" placeholder="请输入任务名称..." value={f.name} onChange={e=>set('name',e.target.value)} required/>
-            </div>
-            <div className="fg">
-              <label>负责人</label>
-              <input type="text" placeholder="负责人姓名" value={f.assignee} onChange={e=>set('assignee',e.target.value)}/>
-            </div>
-            <div className="fg">
-              <label>截止日期</label>
-              <input type="date" value={f.deadline} onChange={e=>set('deadline',e.target.value)}/>
-            </div>
-            <div className="fg">
-              <label>优先级</label>
+            <div className="fg full"><label>任务名称 *</label><input type="text" placeholder="请输入任务名称" value={f.name} onChange={e=>set('name',e.target.value)} required/></div>
+            <div className="fg"><label>负责人</label><input type="text" placeholder="负责人姓名" value={f.assignee} onChange={e=>set('assignee',e.target.value)}/></div>
+            <div className="fg"><label>截止日期</label><input type="date" value={f.deadline} onChange={e=>set('deadline',e.target.value)}/></div>
+            <div className="fg"><label>优先级</label>
               <select value={f.priority} onChange={e=>set('priority',e.target.value)}>
-                <option value="high">🔴 高优先级</option>
-                <option value="mid">🟡 中优先级</option>
-                <option value="low">🟢 低优先级</option>
+                <option value="high">高优先级</option><option value="mid">中优先级</option><option value="low">低优先级</option>
               </select>
             </div>
-            <div className="fg">
-              <label>完成状态</label>
+            <div className="fg"><label>完成状态</label>
               <select value={f.status} onChange={e=>set('status',e.target.value)}>
-                <option value="pending">⏳ 未开始</option>
-                <option value="in-progress">🔄 进行中</option>
-                <option value="completed">✅ 已完成</option>
-                <option value="blocked">🚧 已卡点</option>
+                <option value="pending">未开始</option><option value="in-progress">进行中</option><option value="completed">已完成</option><option value="blocked">已卡点</option>
               </select>
             </div>
-            {f.status==='blocked' && (
-              <div className="fg full">
-                <label>🚧 卡点描述</label>
-                <textarea placeholder="请描述卡点原因、需要的支持资源..." value={f.blocker} onChange={e=>set('blocker',e.target.value)}/>
-              </div>
-            )}
-            <div className="fg full">
-              <label>反馈备注</label>
-              <textarea placeholder="任务备注、进展说明、反馈信息..." value={f.notes} onChange={e=>set('notes',e.target.value)}/>
-            </div>
-            <div className="fg full">
-              <label>上传交付文件</label>
+            {f.status==='blocked'&&<div className="fg full"><label>卡点描述</label><textarea placeholder="描述卡点原因及所需支持..." value={f.blocker} onChange={e=>set('blocker',e.target.value)}/></div>}
+            <div className="fg full"><label>备注反馈</label><textarea placeholder="进展说明、备注信息..." value={f.notes} onChange={e=>set('notes',e.target.value)}/></div>
+            <div className="fg full"><label>上传交付文件</label>
               <div className="file-zone" onClick={()=>fileRef.current?.click()}>
                 <input ref={fileRef} type="file" multiple style={{display:'none'}} onChange={onFile}/>
-                <div style={{fontSize:'1.8rem'}}>📎</div>
-                <div style={{color:'#8B5CF6',fontWeight:700,marginTop:4}}>点击上传交付文件</div>
-                <div style={{color:'#9CA3AF',fontSize:'0.78rem',marginTop:2}}>支持多文件上传</div>
+                <div style={{color:'#16A34A',fontWeight:700,marginBottom:2}}>📎 点击上传交付文件</div>
+                <div style={{color:'#9CA3AF',fontSize:'.75rem'}}>支持多文件</div>
               </div>
-              {f.files.length>0 && (
-                <div style={{marginTop:8}}>
-                  {f.files.map((name,i)=>(
-                    <span key={i} className="file-tag">
-                      📄 {name.length>20?name.slice(0,20)+'...':name}
-                      <span style={{cursor:'pointer',color:'#EF4444',marginLeft:4}} onClick={e=>{e.stopPropagation();setF(p=>({...p,files:p.files.filter((_,j)=>j!==i)}))}}>✕</span>
-                    </span>
-                  ))}
-                </div>
-              )}
+              {f.files.length>0&&<div style={{marginTop:7}}>{f.files.map((n,i)=><span key={i} className="file-tag">📄 {n.length>22?n.slice(0,22)+'…':n}<span style={{cursor:'pointer',color:'#BE123C',marginLeft:3}} onClick={e=>{e.stopPropagation();setF(p=>({...p,files:p.files.filter((_,j)=>j!==i)}));}}>✕</span></span>)}</div>}
             </div>
           </div>
           <div className="modal-foot">
             <button type="button" className="btn btn-ghost" onClick={onClose}>取消</button>
-            <button type="submit" className="btn btn-primary">{task?'保存修改 ✨':'创建任务 ✨'}</button>
+            <button type="submit" className="btn btn-primary">{task?'保存修改':'创建任务'}</button>
           </div>
         </form>
       </div>
@@ -439,125 +390,91 @@ function TaskForm({ task, onSave, onClose }) {
   );
 }
 
-/* ---- Toast ---- */
-function Toast({ msg, onClose }) {
-  useEffect(()=>{ const t=setTimeout(onClose,2600); return()=>clearTimeout(t); },[]);
-  return <div className="toast">✅ {msg}</div>;
+function Toast({msg,onClose}){
+  useEffect(()=>{const t=setTimeout(onClose,2500);return()=>clearTimeout(t);},[]);
+  return <div className="toast">✓ {msg}</div>;
 }
 
-/* ---- Main App ---- */
-function App() {
-  const [tasks, setTasks] = useState(()=>{ try{ const s=localStorage.getItem('tkv2'); return s?JSON.parse(s):DEMO; }catch{ return DEMO; } });
-  const [showForm, setShowForm] = useState(false);
-  const [editTask, setEditTask] = useState(null);
-  const [toast, setToast] = useState(null);
+function App(){
+  const [tasks,setTasks]=useState(()=>{try{const s=localStorage.getItem('tkv3');return s?JSON.parse(s):DEMO;}catch{return DEMO;}});
+  const [showForm,setShowForm]=useState(false);
+  const [editTask,setEditTask]=useState(null);
+  const [toast,setToast]=useState(null);
 
-  useEffect(()=>{ localStorage.setItem('tkv2',JSON.stringify(tasks)); },[tasks]);
+  useEffect(()=>{localStorage.setItem('tkv3',JSON.stringify(tasks));},[tasks]);
 
-  const notify = msg => { setToast(msg); };
-  const save = t => {
-    if (editTask) { setTasks(p=>p.map(x=>x.id===t.id?t:x)); notify('任务已更新！'); }
-    else { setTasks(p=>[...p,t]); notify('任务已创建！'); }
-    setShowForm(false); setEditTask(null);
+  const notify=msg=>setToast(msg);
+  const save=t=>{
+    if(editTask){setTasks(p=>p.map(x=>x.id===t.id?t:x));notify('任务已更新');}
+    else{setTasks(p=>[...p,t]);notify('任务已创建');}
+    setShowForm(false);setEditTask(null);
   };
-  const delTask = id => { if(confirm('确认删除此任务？')){ setTasks(p=>p.filter(t=>t.id!==id)); notify('已删除'); } };
-  const cycleStatus = id => {
-    setTasks(p=>p.map(t=>{
-      if(t.id!==id) return t;
-      const idx=(SCYCLE.indexOf(t.status)+1)%SCYCLE.length;
-      return {...t,status:SCYCLE[idx]};
-    }));
-  };
+  const del=id=>{if(confirm('确认删除此任务？')){setTasks(p=>p.filter(t=>t.id!==id));notify('已删除');}};
+  const cycle=id=>setTasks(p=>p.map(t=>{if(t.id!==id)return t;const i=(SCYCLE.indexOf(t.status)+1)%SCYCLE.length;return{...t,status:SCYCLE[i]};}));
 
-  const today = new Date(); today.setHours(0,0,0,0);
-  const total = tasks.length;
-  const done = tasks.filter(t=>t.status==='completed').length;
-  const doing = tasks.filter(t=>t.status==='in-progress').length;
-  const blocked = tasks.filter(t=>t.status==='blocked').length;
-  const overdue = tasks.filter(t=>t.status!=='completed'&&t.deadline&&new Date(t.deadline)<today).length;
-  const rate = total?Math.round(done/total*100):0;
+  const today=new Date();today.setHours(0,0,0,0);
+  const total=tasks.length;
+  const done=tasks.filter(t=>t.status==='completed').length;
+  const doing=tasks.filter(t=>t.status==='in-progress').length;
+  const blocked=tasks.filter(t=>t.status==='blocked').length;
+  const overdue=tasks.filter(t=>t.status!=='completed'&&t.deadline&&new Date(t.deadline)<today).length;
+  const rate=total?Math.round(done/total*100):0;
 
-  return (
+  return(
     <div className="app">
-      {/* Header */}
       <div className="header">
-        <h1>✨ 工作任务管理系统</h1>
+        <h1>工作任务看板</h1>
         <p>任务追踪 · 进度管理 · 交付物上传 · 卡点反馈</p>
       </div>
 
-      {/* Stats */}
       <div className="stats-grid">
-        <div className="stat-card s-total"><div className="stat-num">{total}</div><div className="stat-label">📋 全部任务</div></div>
-        <div className="stat-card s-done"><div className="stat-num">{done}</div><div className="stat-label">✅ 已完成</div></div>
-        <div className="stat-card s-doing"><div className="stat-num">{doing}</div><div className="stat-label">🔄 进行中</div></div>
-        <div className="stat-card s-blocked"><div className="stat-num">{blocked}</div><div className="stat-label">🚧 已卡点</div></div>
-        <div className="stat-card s-overdue"><div className="stat-num">{overdue}</div><div className="stat-label">⚠️ 逾期中</div></div>
+        <div className="stat-card s-total"><div className="stat-num">{total}</div><div className="stat-label">全部任务</div></div>
+        <div className="stat-card s-done"><div className="stat-num">{done}</div><div className="stat-label">已完成</div></div>
+        <div className="stat-card s-doing"><div className="stat-num">{doing}</div><div className="stat-label">进行中</div></div>
+        <div className="stat-card s-blocked"><div className="stat-num">{blocked}</div><div className="stat-label">已卡点</div></div>
+        <div className="stat-card s-overdue"><div className="stat-num">{overdue}</div><div className="stat-label">逾期中</div></div>
       </div>
 
-      {/* Progress */}
       <div className="card">
-        <div className="prog-row">
-          <span style={{fontWeight:700}}>📊 整体完成率</span>
-          <span className="prog-rate">{rate}%</span>
-        </div>
+        <div className="prog-row"><span style={{fontWeight:700,fontSize:'.9rem'}}>整体完成率</span><span className="prog-rate">{rate}%</span></div>
         <div className="prog-bar"><div className="prog-fill" style={{width:`${rate}%`}}/></div>
       </div>
 
-      {/* Task List */}
       <div className="card">
         <div className="row-between">
-          <div className="sec-title">📋 任务列表</div>
-          <button className="add-btn" onClick={()=>{setEditTask(null);setShowForm(true);}}>
-            <span style={{fontSize:'1.2rem',lineHeight:1}}>＋</span> 新建任务
-          </button>
+          <div className="sec-title">任务列表</div>
+          <button className="add-btn" onClick={()=>{setEditTask(null);setShowForm(true);}}>＋ 新建任务</button>
         </div>
-
-        {tasks.length===0 ? (
-          <div className="empty">
-            <div className="e-icon">📝</div>
-            <div style={{fontWeight:600,marginBottom:6}}>还没有任务</div>
-            <div style={{fontSize:'0.85rem'}}>点击「新建任务」开始添加</div>
-          </div>
-        ) : (
+        {tasks.length===0?(
+          <div className="empty"><div style={{fontSize:'2.5rem',marginBottom:10}}>📋</div><div style={{fontWeight:600,marginBottom:4}}>暂无任务</div><div style={{fontSize:'.83rem'}}>点击「新建任务」开始添加</div></div>
+        ):(
           <>
-            {/* Desktop table */}
             <div style={{overflowX:'auto'}}>
               <table className="task-table">
-                <thead>
-                  <tr>
-                    <th>任务名称</th><th>负责人</th><th>截止日期</th><th>优先级</th>
-                    <th>状态（点击切换）</th><th>交付文件</th><th>操作</th>
-                  </tr>
-                </thead>
+                <thead><tr><th>任务</th><th>负责人</th><th>截止日期</th><th>优先级</th><th>状态</th><th>交付文件</th><th></th></tr></thead>
                 <tbody>
                   {tasks.map(t=>{
-                    const ov = t.status!=='completed'&&t.deadline&&new Date(t.deadline)<today;
-                    return (
+                    const ov=t.status!=='completed'&&t.deadline&&new Date(t.deadline)<today;
+                    return(
                       <tr key={t.id}>
-                        <td>
-                          <div style={{fontWeight:600}}>{t.name}</div>
-                          {t.status==='blocked'&&t.blocker&&<div style={{color:'#EF4444',fontSize:'0.76rem',marginTop:2}}>🚧 {t.blocker}</div>}
-                          {t.notes&&<div style={{color:'#9CA3AF',fontSize:'0.76rem',marginTop:2}}>💬 {t.notes.length>50?t.notes.slice(0,50)+'…':t.notes}</div>}
+                        <td style={{maxWidth:260}}>
+                          <div className="task-name">{t.name}</div>
+                          {t.status==='blocked'&&t.blocker&&<div className="task-block">▲ {t.blocker}</div>}
+                          {t.notes&&<div className="task-sub">{t.notes.length>48?t.notes.slice(0,48)+'…':t.notes}</div>}
                         </td>
-                        <td><span style={{background:'#F3F0FF',color:'#7C3AED',padding:'2px 9px',borderRadius:6,fontSize:'0.82rem',fontWeight:600}}>{t.assignee||'—'}</span></td>
-                        <td>
+                        <td><span className="chip">{t.assignee||'—'}</span></td>
+                        <td style={{whiteSpace:'nowrap',fontSize:'.82rem'}}>
                           {t.deadline?new Date(t.deadline).toLocaleDateString('zh-CN'):'—'}
-                          {ov&&<span className="ov-tag">逾期</span>}
+                          {ov&&<span className="ov">逾期</span>}
                         </td>
-                        <td><span className={P[t.priority]?.cls}>{P[t.priority]?.emoji} {P[t.priority]?.label}</span></td>
-                        <td>
-                          <span className={`badge ${S[t.status]?.cls}`} onClick={()=>cycleStatus(t.id)} title="点击切换状态">
-                            {S[t.status]?.emoji} {S[t.status]?.label}
-                          </span>
+                        <td><span className={P[t.priority]?.cls}>{P[t.priority]?.e} {P[t.priority]?.label}</span></td>
+                        <td><span className={`badge ${S[t.status]?.cls}`} onClick={()=>cycle(t.id)} title="点击切换状态">{S[t.status]?.emoji} {S[t.status]?.label}</span></td>
+                        <td style={{minWidth:80}}>
+                          {t.files?.length>0?t.files.map((f,i)=><span key={i} className="file-tag">📄 {f.length>12?f.slice(0,12)+'…':f}</span>):<span style={{color:'#D1D5DB',fontSize:'.75rem'}}>—</span>}
                         </td>
-                        <td>
-                          {t.files?.length>0
-                            ? t.files.map((f,i)=><span key={i} className="file-tag">📄 {f.length>14?f.slice(0,14)+'…':f}</span>)
-                            : <span style={{color:'#D1D5DB',fontSize:'0.8rem'}}>无</span>}
-                        </td>
-                        <td>
-                          <button className="btn btn-ghost btn-sm" style={{marginRight:6}} onClick={()=>{setEditTask(t);setShowForm(true);}}>✏️</button>
-                          <button className="btn btn-del btn-sm" onClick={()=>delTask(t.id)}>🗑️</button>
+                        <td style={{whiteSpace:'nowrap'}}>
+                          <button className="btn btn-ghost btn-sm" style={{marginRight:5}} onClick={()=>{setEditTask(t);setShowForm(true);}}>编辑</button>
+                          <button className="btn btn-del btn-sm" onClick={()=>del(t.id)}>删除</button>
                         </td>
                       </tr>
                     );
@@ -565,27 +482,25 @@ function App() {
                 </tbody>
               </table>
             </div>
-
-            {/* Mobile cards */}
             <div className="mobile-cards">
               {tasks.map(t=>{
                 const ov=t.status!=='completed'&&t.deadline&&new Date(t.deadline)<today;
-                return (
+                return(
                   <div key={t.id} className="m-card">
-                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'start',marginBottom:8}}>
-                      <div style={{fontWeight:700,flex:1,marginRight:8}}>{t.name}</div>
-                      <span className={`badge ${S[t.status]?.cls}`} onClick={()=>cycleStatus(t.id)}>{S[t.status]?.emoji} {S[t.status]?.label}</span>
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'start',marginBottom:7}}>
+                      <div style={{fontWeight:700,flex:1,marginRight:8,fontSize:'.9rem'}}>{t.name}</div>
+                      <span className={`badge ${S[t.status]?.cls}`} onClick={()=>cycle(t.id)}>{S[t.status]?.emoji} {S[t.status]?.label}</span>
                     </div>
-                    <div style={{fontSize:'0.82rem',color:'#6B7280'}}>
+                    <div style={{fontSize:'.78rem',color:'#6B7280',display:'flex',flexWrap:'wrap',gap:'6px 12px'}}>
                       <span>👤 {t.assignee||'—'}</span>
-                      {t.deadline&&<span style={{marginLeft:8}}>📅 {new Date(t.deadline).toLocaleDateString('zh-CN')}{ov&&<span className="ov-tag">逾期</span>}</span>}
-                      <span style={{marginLeft:8}}>{P[t.priority]?.emoji} {P[t.priority]?.label}</span>
+                      {t.deadline&&<span>📅 {new Date(t.deadline).toLocaleDateString('zh-CN')}{ov&&<span className="ov">逾期</span>}</span>}
+                      <span className={P[t.priority]?.cls}>{P[t.priority]?.e} {P[t.priority]?.label}</span>
                     </div>
-                    {t.status==='blocked'&&t.blocker&&<div style={{color:'#EF4444',fontSize:'0.78rem',marginTop:4}}>🚧 {t.blocker}</div>}
-                    {t.files?.length>0&&<div style={{marginTop:4}}>{t.files.map((f,i)=><span key={i} className="file-tag">📄 {f.length>16?f.slice(0,16)+'…':f}</span>)}</div>}
-                    <div style={{display:'flex',gap:8,marginTop:10}}>
-                      <button className="btn btn-ghost btn-sm" onClick={()=>{setEditTask(t);setShowForm(true);}}>✏️ 编辑</button>
-                      <button className="btn btn-del btn-sm" onClick={()=>delTask(t.id)}>🗑️ 删除</button>
+                    {t.status==='blocked'&&t.blocker&&<div className="task-block" style={{marginTop:5}}>▲ {t.blocker}</div>}
+                    {t.files?.length>0&&<div style={{marginTop:5}}>{t.files.map((f,i)=><span key={i} className="file-tag">📄 {f.length>18?f.slice(0,18)+'…':f}</span>)}</div>}
+                    <div style={{display:'flex',gap:7,marginTop:9}}>
+                      <button className="btn btn-ghost btn-sm" onClick={()=>{setEditTask(t);setShowForm(true);}}>编辑</button>
+                      <button className="btn btn-del btn-sm" onClick={()=>del(t.id)}>删除</button>
                     </div>
                   </div>
                 );
@@ -595,58 +510,40 @@ function App() {
         )}
       </div>
 
-      {/* Dashboard */}
       <div className="card">
-        <div className="sec-title">📊 数据看板</div>
+        <div className="sec-title">数据看板</div>
         <div className="chart-grid">
           <div>
-            <div style={{fontWeight:600,marginBottom:12,color:'#6B7280',fontSize:'0.88rem'}}>任务状态分布</div>
+            <div style={{fontSize:'.82rem',color:'#6B7280',fontWeight:600,marginBottom:11}}>状态分布</div>
             <Donut tasks={tasks}/>
           </div>
           <div>
-            <div style={{fontWeight:600,marginBottom:12,color:'#6B7280',fontSize:'0.88rem'}}>优先级分布</div>
+            <div style={{fontSize:'.82rem',color:'#6B7280',fontWeight:600,marginBottom:11}}>优先级分布</div>
             {['high','mid','low'].map(p=>{
               const cnt=tasks.filter(t=>t.priority===p).length;
-              const pct=total>0?cnt/total*100:0;
-              return (
+              const pct=total?cnt/total*100:0;
+              return(
                 <div key={p} className="pri-bar-wrap">
-                  <div className="pri-bar-label">
-                    <span className={P[p].cls}>{P[p].emoji} {P[p].label}优先级</span>
-                    <span style={{fontWeight:700}}>{cnt} 个</span>
-                  </div>
-                  <div className="pri-bar-bg">
-                    <div className="pri-bar-fill" style={{width:`${pct}%`,background:p==='high'?'#EF4444':p==='mid'?'#F59E0B':'#10B981'}}/>
-                  </div>
+                  <div className="pri-bar-label"><span className={P[p].cls}>{P[p].e} {P[p].label}优先级</span><span style={{fontWeight:700}}>{cnt}</span></div>
+                  <div className="pri-bar-bg"><div className="pri-bar-fill" style={{width:`${pct}%`,background:p==='high'?'#DC2626':p==='mid'?'#D97706':'#16A34A'}}/></div>
                 </div>
               );
             })}
             <div className="summary-box">
-              <div style={{fontSize:'0.82rem',color:'#6B7280',fontWeight:600}}>今日概况</div>
+              <div style={{fontSize:'.78rem',color:'#6B7280',fontWeight:700}}>今日概况</div>
               <div className="summary-grid">
-                <div className="summary-cell">
-                  <div className="summary-num" style={{color:'#8B5CF6'}}>{rate}%</div>
-                  <div className="summary-label">完成率</div>
-                </div>
-                <div className="summary-cell">
-                  <div className="summary-num" style={{color:overdue>0?'#EF4444':'#10B981'}}>{overdue}</div>
-                  <div className="summary-label">逾期任务</div>
-                </div>
-                <div className="summary-cell">
-                  <div className="summary-num" style={{color:'#EF4444'}}>{blocked}</div>
-                  <div className="summary-label">卡点任务</div>
-                </div>
-                <div className="summary-cell">
-                  <div className="summary-num" style={{color:'#3B82F6'}}>{doing}</div>
-                  <div className="summary-label">进行中</div>
-                </div>
+                <div className="summary-cell"><div className="summary-num" style={{color:'#16A34A'}}>{rate}%</div><div className="summary-lbl">完成率</div></div>
+                <div className="summary-cell"><div className="summary-num" style={{color:overdue>0?'#DC2626':'#16A34A'}}>{overdue}</div><div className="summary-lbl">逾期任务</div></div>
+                <div className="summary-cell"><div className="summary-num" style={{color:'#9F1239'}}>{blocked}</div><div className="summary-lbl">卡点任务</div></div>
+                <div className="summary-cell"><div className="summary-num" style={{color:'#1D4ED8'}}>{doing}</div><div className="summary-lbl">进行中</div></div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {showForm && <TaskForm task={editTask} onSave={save} onClose={()=>{setShowForm(false);setEditTask(null);}}/>}
-      {toast && <Toast msg={toast} onClose={()=>setToast(null)}/>}
+      {showForm&&<TaskForm task={editTask} onSave={save} onClose={()=>{setShowForm(false);setEditTask(null);}}/>}
+      {toast&&<Toast msg={toast} onClose={()=>setToast(null)}/>}
       <Avatar tasks={tasks}/>
     </div>
   );
