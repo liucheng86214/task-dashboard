@@ -135,52 +135,62 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 @keyframes slideIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
 .toast{position:fixed;top:18px;right:18px;z-index:9999;padding:11px 18px;border-radius:10px;background:#fff;box-shadow:0 6px 24px rgba(0,0,0,.12);display:flex;align-items:center;gap:7px;animation:slideIn .25s ease;font-size:.85rem;font-weight:600;border-left:3px solid var(--g2)}
 
-/* ========= ROBOT AVATAR ========= */
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-@keyframes eyepulse{0%,100%{box-shadow:0 0 5px #4ADE80}50%{box-shadow:0 0 14px #22C55E,0 0 4px #fff}}
-@keyframes blink{0%,88%,100%{transform:scaleY(1)}93%{transform:scaleY(0.08)}}
-@keyframes robotalk{0%,100%{height:5px;width:28px}50%{height:11px;width:26px;border-radius:3px}}
-@keyframes ripple{0%{transform:scale(.8);opacity:1}100%{transform:scale(2.3);opacity:0}}
-@keyframes antglow{0%,100%{box-shadow:0 0 6px #4ADE80}50%{box-shadow:0 0 16px #22C55E}}
-@keyframes ledflash{0%,100%{opacity:1}50%{opacity:.3}}
+/* ========= WALL-E AVATAR ========= */
+@keyframes walleFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes walleBlink{0%,78%,100%{transform:scaleY(1)}86%{transform:scaleY(0.06)}}
+@keyframes walleTilt{0%,55%,100%{transform:rotate(0deg) translateX(-50%)}68%{transform:rotate(-20deg) translateX(-50%)}80%{transform:rotate(14deg) translateX(-50%)}}
+@keyframes walleLens{0%,100%{box-shadow:0 0 6px rgba(91,184,232,.5)}50%{box-shadow:0 0 14px rgba(91,184,232,.9),0 0 4px #fff}}
+@keyframes walleRipple{0%{transform:scale(.8);opacity:1}100%{transform:scale(2.4);opacity:0}}
+@keyframes redBlink{0%,100%{opacity:1;box-shadow:0 0 4px currentColor}50%{opacity:.2;box-shadow:none}}
 
 .av-wrap{position:fixed;bottom:26px;right:26px;z-index:1000;cursor:pointer;user-select:none}
-.av-bubble{position:absolute;bottom:128px;right:0;background:#fff;border-radius:14px 14px 0 14px;padding:10px 13px;width:175px;font-size:.78rem;line-height:1.5;color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.1);border:1.5px solid #BBF7D0;animation:float 3s ease-in-out infinite}
-.av-ripple{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:108px;height:108px;border-radius:50%;background:rgba(34,197,94,.2);animation:ripple 1.4s ease-out infinite;pointer-events:none}
-.av-robot{width:90px;height:108px;position:relative;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 8px 18px rgba(22,163,74,.25))}
+.av-bubble{position:absolute;bottom:144px;right:0;background:#fff;border-radius:14px 14px 0 14px;padding:10px 13px;width:178px;font-size:.78rem;line-height:1.5;color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.1);border:1.5px solid #FDE68A;animation:walleFloat 3.2s ease-in-out infinite}
+.av-ripple{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:112px;height:112px;border-radius:50%;background:rgba(212,152,10,.15);animation:walleRipple 1.4s ease-out infinite;pointer-events:none}
 
-/* Antenna */
-.av-ant{position:absolute;top:0;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center}
-.av-ant-stick{width:3px;height:14px;background:#6EE7B7;border-radius:2px}
-.av-ant-ball{width:10px;height:10px;border-radius:50%;background:#22C55E;margin-top:-1px;animation:antglow 2s ease-in-out infinite}
+/* WALL-E character */
+.walle{width:90px;height:130px;position:relative;overflow:visible;animation:walleFloat 3.2s ease-in-out infinite;filter:drop-shadow(0 8px 22px rgba(160,110,0,.32))}
 
-/* Head */
-.av-head{position:absolute;top:12px;left:5px;width:80px;height:62px;background:linear-gradient(145deg,#F0FDF4,#DCFCE7);border-radius:14px;border:2px solid #6EE7B7}
+/* Caterpillar tracks */
+.wt{position:absolute;bottom:0;left:1px;width:88px;height:17px;background:#1A1A1A;border-radius:8px;overflow:hidden}
+.wt::before{content:'';position:absolute;top:4px;left:5px;right:5px;height:9px;background:repeating-linear-gradient(90deg,#2C2C2C 0,#2C2C2C 10px,#111 10px,#111 20px);border-radius:4px}
+.wt-w{position:absolute;top:50%;transform:translateY(-50%);width:11px;height:11px;background:#2E2E2E;border-radius:50%;border:1px solid #444}
+.wt-w.l{left:7px}
+.wt-w.r{right:7px}
 
-/* Bolts */
-.av-bolt{position:absolute;top:50%;transform:translateY(-50%);width:8px;height:8px;background:#9CA3AF;border-radius:50%;border:1px solid #D1D5DB}
-.av-bolt.l{left:-5px}
-.av-bolt.r{right:-5px}
+/* Body block */
+.wb{position:absolute;bottom:15px;left:9px;width:72px;height:50px;background:linear-gradient(160deg,#E0A40C 0%,#C88A09 50%,#A67208 100%);border-radius:6px;border:2px solid #7A5408;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -2px 0 rgba(0,0,0,.18)}
+/* Horizontal seam line */
+.wb::before{content:'';position:absolute;top:50%;left:5px;right:5px;height:1px;background:rgba(0,0,0,.22)}
+/* Body panel with LEDs */
+.wbp{position:absolute;top:7px;left:50%;transform:translateX(-50%);width:46px;height:18px;background:#7A5408;border-radius:3px;border:1px solid #5C3D06;display:flex;align-items:center;justify-content:center;gap:7px}
+.wbpl{width:9px;height:9px;border-radius:50%}
+.wbpl.r{color:#E74C3C;background:#E74C3C;box-shadow:0 0 5px #E74C3C;animation:redBlink 1.6s ease-in-out infinite}
+.wbpl.g{color:#27AE60;background:#27AE60;box-shadow:0 0 5px #27AE60;animation:redBlink 2.2s ease-in-out infinite .7s}
 
-/* Eyes */
-.av-eyes{position:absolute;top:16px;left:50%;transform:translateX(-50%);display:flex;gap:16px;animation:blink 5s ease-in-out infinite}
-.av-eye{width:18px;height:18px;background:#1a2e1f;border-radius:4px;display:flex;align-items:center;justify-content:center}
-.av-eye-led{width:10px;height:10px;background:#4ADE80;border-radius:50%;animation:eyepulse 2s ease-in-out infinite}
+/* Head block */
+.wh{position:absolute;bottom:63px;left:9px;width:72px;height:42px;background:linear-gradient(145deg,#DDA00C,#C88A09);border-radius:6px;border:2px solid #7A5408;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -1px 0 rgba(0,0,0,.14);overflow:visible}
+.wh::after{content:'';position:absolute;bottom:9px;left:8px;right:8px;height:1px;background:rgba(0,0,0,.18)}
+/* Corner rivets */
+.wr{position:absolute;width:5px;height:5px;background:#7A5408;border-radius:50%;top:4px}
+.wr.l{left:5px}
+.wr.r{right:5px}
 
-/* Mouth */
-.av-mouth-bar{position:absolute;bottom:11px;left:50%;transform:translateX(-50%);width:28px;height:5px;background:#16A34A;border-radius:3px}
-.av-mouth-bar.talking{animation:robotalk .14s ease-in-out infinite}
+/* Speaker bars (VU meter when talking) */
+.whs{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);display:flex;gap:3px;align-items:flex-end}
+.whsg{width:3px;background:rgba(0,0,0,.35);border-radius:1px;min-height:2px;transition:height .08s}
 
-/* Screen (between eyes and mouth) */
-.av-screen{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);font-size:10px;color:#16A34A;font-weight:700;letter-spacing:1px;opacity:.7}
-
-/* Body */
-.av-body{position:absolute;bottom:0;left:11px;width:68px;height:36px;background:linear-gradient(145deg,#DCFCE7,#BBF7D0);border-radius:10px;border:2px solid #6EE7B7}
-.av-panel{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;gap:5px;align-items:center}
-.av-led{width:7px;height:7px;border-radius:50%}
-.av-led.g{background:#22C55E;animation:ledflash 1.2s ease-in-out infinite}
-.av-led.y{background:#FCD34D;animation:ledflash 1.8s ease-in-out infinite .4s}
-.av-led.r{background:#F87171;animation:ledflash 2.4s ease-in-out infinite .8s}
+/* EYE ASSEMBLY — the iconic WALL-E binoculars */
+.we{position:absolute;top:-30px;left:50%;transform:translateX(-50%);display:flex;gap:4px;transform-origin:50% 100%}
+.we.tilt{animation:walleTilt 5.5s ease-in-out infinite 1.5s}
+/* Eye bridge connector */
+.web{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:52px;height:5px;background:#2A2A2A;border-radius:2px;z-index:0}
+/* Single eye cylinder */
+.weu{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#585858,#1E1E1E);border:3px solid #3A3A3A;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 8px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08);position:relative;z-index:1}
+/* Iris */
+.wei{width:21px;height:21px;border-radius:50%;background:#080E14;display:flex;align-items:center;justify-content:center;animation:walleBlink 5.5s ease-in-out infinite}
+/* Lens — beautiful blue WALL-E eyes */
+.wel{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 32% 28%,#D0EEFA,#5BB8E8 45%,#1867A8 80%,#0A3560 100%);animation:walleLens 2.8s ease-in-out infinite;position:relative}
+.wel::after{content:'';position:absolute;width:4px;height:4px;background:rgba(255,255,255,.88);border-radius:50%;top:2px;right:2px}
 
 /* Mobile */
 @media(max-width:768px){
@@ -199,7 +209,7 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
   .overlay{align-items:flex-end}
   .modal{border-radius:18px 18px 0 0;max-height:93vh;width:100%;max-width:100%}
   .av-wrap{bottom:14px;right:14px}
-  .av-bubble{width:155px;font-size:.74rem;bottom:115px}
+  .av-bubble{width:155px;font-size:.74rem;bottom:130px}
 }
 @media(max-width:420px){
   .stats-grid{grid-template-columns:repeat(2,1fr)}
@@ -264,11 +274,31 @@ function Donut({tasks}){
   );
 }
 
-/* Robot Avatar */
+/* WALL-E Avatar */
 function Avatar({tasks}){
   const [talking,setTalking]=useState(false);
+  const [tilt,setTilt]=useState(false);
   const [ripple,setRipple]=useState(false);
-  const [bubble,setBubble]=useState('点我听工作汇报 🤖');
+  const [bubble,setBubble]=useState('嘟嘟~ 点我听汇报');
+  const [bars,setBars]=useState([2,4,2,4,2]);
+
+  const beep=(freq,dur,delay=0)=>{
+    try{
+      const ctx=new(window.AudioContext||window.webkitAudioContext)();
+      const osc=ctx.createOscillator(),gain=ctx.createGain();
+      osc.connect(gain);gain.connect(ctx.destination);
+      osc.type='sine';osc.frequency.setValueAtTime(freq,ctx.currentTime+delay);
+      gain.gain.setValueAtTime(0,ctx.currentTime+delay);
+      gain.gain.linearRampToValueAtTime(0.18,ctx.currentTime+delay+0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+delay+dur);
+      osc.start(ctx.currentTime+delay);osc.stop(ctx.currentTime+delay+dur+0.05);
+    }catch(e){}
+  };
+
+  // WALL-E's signature ascending greeting beeps
+  const walleHello=()=>{beep(440,.1,0);beep(587,.1,.14);beep(880,.2,.28);};
+  // WALL-E's satisfied descending end tone
+  const walleDone=()=>{beep(880,.08,0);beep(659,.08,.11);beep(523,.22,.22);};
 
   const genReport=()=>{
     const total=tasks.length;
@@ -280,14 +310,12 @@ function Avatar({tasks}){
     const rate=Math.round(done/total*100);
     const today=new Date();today.setHours(0,0,0,0);
     const overdue=tasks.filter(t=>t.status!=='completed'&&t.deadline&&new Date(t.deadline)<today);
-
     let r=`老板，您好。以下是当前工作进度汇报。共有${total}项任务，整体完成率${rate}%。`;
     r+=`其中已完成${done}项，进行中${doing}项，未开始${pending}项。`;
     if(blocked>0){
       r+=`有${blocked}项任务存在卡点，请重点关注。`;
       tasks.filter(t=>t.status==='blocked').forEach(t=>{
-        if(t.blocker) r+=`"${t.name}"的卡点为：${t.blocker}。`;
-        else r+=`"${t.name}"卡点原因待补充。`;
+        r+=t.blocker?`"${t.name}"卡点为：${t.blocker}。`:`"${t.name}"卡点原因待补充。`;
       });
     }
     if(overdue.length>0) r+=`另有${overdue.length}项任务已逾期，建议及时跟进。`;
@@ -299,41 +327,51 @@ function Avatar({tasks}){
   };
 
   const speak=()=>{
-    if(!('speechSynthesis' in window)){setBubble('浏览器不支持语音功能');return;}
+    if(!('speechSynthesis' in window)){setBubble('浏览器暂不支持语音');return;}
     window.speechSynthesis.cancel();
-    const text=genReport();
-    const total=tasks.length;
-    const done=tasks.filter(t=>t.status==='completed').length;
+    walleHello();
+    setTilt(true);setRipple(true);
+    const total=tasks.length,done=tasks.filter(t=>t.status==='completed').length;
     const rate=total?Math.round(done/total*100):0;
-    setBubble(total===0?'暂无任务，请添加 📋':`${total}项任务 · 完成率${rate}%`);
-    setTalking(true);setRipple(true);
-    const utt=new SpeechSynthesisUtterance(text);
-    utt.lang='zh-CN';utt.rate=1.05;utt.pitch=1.1;utt.volume=1;
-    const voices=window.speechSynthesis.getVoices();
-    const v=voices.find(v=>v.lang.startsWith('zh')&&(v.name.includes('Ting')||v.name.includes('女')||v.name.includes('Female')||v.name.includes('Xiao')))
-          ||voices.find(v=>v.lang.startsWith('zh'));
-    if(v) utt.voice=v;
-    utt.onend=()=>{setTalking(false);setRipple(false);setBubble('汇报完毕，随时待命 ✅');setTimeout(()=>setBubble('点我听工作汇报 🤖'),3000);};
-    window.speechSynthesis.speak(utt);
+    setBubble(total===0?'暂无任务，快去添加！':`${total}项任务 · 完成${rate}%`);
+    setTimeout(()=>{
+      const utt=new SpeechSynthesisUtterance(genReport());
+      utt.lang='zh-CN';utt.rate=0.95;utt.pitch=1.05;utt.volume=1;
+      const voices=window.speechSynthesis.getVoices();
+      const v=voices.find(v=>v.lang.startsWith('zh')&&(v.name.includes('Ting')||v.name.includes('Xiao')||v.name.includes('女')||v.name.includes('Female')))||voices.find(v=>v.lang.startsWith('zh'));
+      if(v) utt.voice=v;
+      setTalking(true);
+      const barTimer=setInterval(()=>setBars([...Array(5)].map(()=>Math.floor(Math.random()*7)+2)),130);
+      utt.onend=()=>{
+        clearInterval(barTimer);setTalking(false);setRipple(false);setBars([2,4,2,4,2]);
+        walleDone();
+        setBubble('汇报完毕，随时待命 ✅');
+        setTimeout(()=>{setTilt(false);setBubble('嘟嘟~ 点我听汇报');},3000);
+      };
+      window.speechSynthesis.speak(utt);
+    },560);
   };
 
   return(
     <div className="av-wrap" onClick={speak} title="点击收听工作汇报">
       <div className="av-bubble">{bubble}</div>
       {ripple&&<div className="av-ripple"/>}
-      <div className="av-robot">
-        {/* Antenna */}
-        <div className="av-ant"><div className="av-ant-ball"/><div className="av-ant-stick"/></div>
-        {/* Head */}
-        <div className="av-head">
-          <div className="av-bolt l"/><div className="av-bolt r"/>
-          <div className="av-eyes"><div className="av-eye"><div className="av-eye-led"/></div><div className="av-eye"><div className="av-eye-led"/></div></div>
-          <div className="av-screen">{talking?'...':'OK'}</div>
-          <div className={`av-mouth-bar${talking?' talking':''}`}/>
-        </div>
+      <div className="walle">
+        {/* Tracks */}
+        <div className="wt"><div className="wt-w l"/><div className="wt-w r"/></div>
         {/* Body */}
-        <div className="av-body">
-          <div className="av-panel"><div className="av-led g"/><div className="av-led y"/><div className="av-led r"/></div>
+        <div className="wb"><div className="wbp"><div className="wbpl r"/><div className="wbpl g"/></div></div>
+        {/* Head */}
+        <div className="wh">
+          <div className="wr l"/><div className="wr r"/>
+          {/* WALL-E binocular eyes */}
+          <div className={`we${tilt?' tilt':''}`}>
+            <div className="web"/>
+            <div className="weu"><div className="wei"><div className="wel"/></div></div>
+            <div className="weu"><div className="wei"><div className="wel"/></div></div>
+          </div>
+          {/* Speaker VU bars */}
+          <div className="whs">{bars.map((h,i)=><div key={i} className="whsg" style={{height:`${h}px`}}/>)}</div>
         </div>
       </div>
     </div>
