@@ -366,8 +366,8 @@ function Donut({tasks}){
   );
 }
 
-/* shared TTS helper — uses saved voice, pitch=2 */
-function makeTTS(text,{pitch=2,rate=1.1}={}){
+/* shared TTS helper — natural voice, no pitch distortion */
+function makeTTS(text,{pitch=1.0,rate=1.0}={}){
   return new Promise(resolve=>{
     if(!window.speechSynthesis){resolve();return;}
     window.speechSynthesis.cancel();
@@ -531,11 +531,13 @@ function Avatar({tasks}){
 
 /* Voice Float — press & hold to talk with AI */
 function VoiceFloat({tasks}){
-  const [phase,setPhase]=useState('idle'); // idle | rec | proc | talking
+  const [phase,setPhase]=useState('idle');
   const [status,setStatus]=useState('按住说话');
   const [bars,setBars]=useState([3,5,3,5,3]);
   const recogRef=useRef(null);
   const barTimerRef=useRef(null);
+  const isRecRef=useRef(false);   // ref版phase，避免闭包旧值
+  const gotResultRef=useRef(false); // 防止onend覆盖onresult
 
   const startBars=()=>{barTimerRef.current=setInterval(()=>setBars([...Array(5)].map(()=>Math.floor(Math.random()*9)+2)),110);};
   const stopBars=()=>{clearInterval(barTimerRef.current);setBars([3,5,3,5,3]);};
@@ -558,16 +560,20 @@ function VoiceFloat({tasks}){
 
   const handlePress=e=>{
     e.preventDefault();
-    if(phase!=='idle') return;
+    if(isRecRef.current||phase!=='idle') return;
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
     if(!SR){setStatus('浏览器不支持语音识别');setTimeout(()=>setStatus('按住说话'),2000);return;}
     window.speechSynthesis.cancel();
     const r=new SR();r.lang='zh-CN';r.interimResults=false;r.maxAlternatives=1;
     recogRef.current=r;
+    isRecRef.current=true;
+    gotResultRef.current=false;
     setPhase('rec');setStatus('松开发送 🎙️');
     startBars();
     beepFn(1047,.05,0);beepFn(1319,.05,.1);
     r.onresult=async ev=>{
+      gotResultRef.current=true;
+      isRecRef.current=false;
       const q=ev.results[0][0].transcript;
       stopBars();setPhase('proc');setStatus(`"${q}"`);
       try{
@@ -583,18 +589,18 @@ function VoiceFloat({tasks}){
         setTimeout(()=>setStatus('按住说话'),3000);
       }
     };
-    r.onerror=()=>{stopBars();setPhase('idle');setStatus('没听清，再试试');setTimeout(()=>setStatus('按住说话'),2000);};
+    r.onerror=()=>{isRecRef.current=false;gotResultRef.current=false;stopBars();setPhase('idle');setStatus('没听清，再试试');setTimeout(()=>setStatus('按住说话'),2000);};
     r.onend=()=>{
-      stopBars();
-      setPhase(p=>p==='rec'?'idle':p);
-      setStatus(s=>s==='松开发送 🎙️'?'按住说话':s);
+      isRecRef.current=false;
+      if(!gotResultRef.current){stopBars();setPhase('idle');setStatus('按住说话');}
+      gotResultRef.current=false;
     };
     r.start();
   };
 
   const handleRelease=e=>{
     e.preventDefault();
-    if(recogRef.current&&phase==='rec') recogRef.current.stop();
+    if(recogRef.current&&isRecRef.current) recogRef.current.stop(); // 用ref不用闭包
   };
 
   const btnClass=`vf-btn${phase==='rec'?' rec':''}${phase==='proc'||phase==='talking'?' proc':''}`;
