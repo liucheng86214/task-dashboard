@@ -327,7 +327,7 @@ function Avatar({tasks}){
   };
 
   // WALL-E's signature ascending greeting beeps
-  const walleHello=()=>{beep(440,.1,0);beep(587,.1,.14);beep(880,.2,.28);};
+  const walleHello=()=>{beep(880,.08,0);beep(1047,.08,.12);beep(1319,.08,.24);beep(1568,.15,.36);};
   // WALL-E's satisfied descending end tone
   const walleDone=()=>{beep(880,.08,0);beep(659,.08,.11);beep(523,.22,.22);};
 
@@ -367,9 +367,9 @@ function Avatar({tasks}){
     setBubble(total===0?'暂无任务，快去添加！':`${total}项任务 · 完成${rate}%`);
     setTimeout(()=>{
       const utt=new SpeechSynthesisUtterance(genReport());
-      utt.lang='zh-CN';utt.rate=0.95;utt.pitch=1.05;utt.volume=1;
+      utt.lang='zh-CN';utt.rate=1.1;utt.pitch=1.9;utt.volume=1;
       const voices=window.speechSynthesis.getVoices();
-      const v=voices.find(v=>v.lang.startsWith('zh')&&(v.name.includes('Ting')||v.name.includes('Xiao')||v.name.includes('女')||v.name.includes('Female')))||voices.find(v=>v.lang.startsWith('zh'));
+      const v=voices.find(v=>v.lang.startsWith('zh')&&(v.name.includes('XiaoXiao')||v.name.includes('Tingting')||v.name.includes('Ting-Ting')))||voices.find(v=>v.lang.startsWith('zh')&&(v.name.includes('Xiao')||v.name.includes('Female')||v.name.includes('女')))||voices.find(v=>v.lang.startsWith('zh'));
       if(v) utt.voice=v;
       setTalking(true);
       const barTimer=setInterval(()=>setBars([...Array(5)].map(()=>Math.floor(Math.random()*7)+2)),130);
