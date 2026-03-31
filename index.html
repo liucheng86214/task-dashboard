@@ -223,6 +223,27 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .rv.talking .rv-head{animation:rvHeadNod .55s ease-in-out infinite}
 .rv.talking .rv-wheel{animation:rvWheelSpin 1s linear infinite}
 
+/* ── Listening pulse ── */
+@keyframes rvListen{0%,100%{filter:drop-shadow(0 0 6px rgba(91,192,232,.5))}50%{filter:drop-shadow(0 0 22px rgba(91,192,232,1))}}
+.rv.listening{animation:rvListen .7s ease-in-out infinite,rvFloat 3.2s ease-in-out infinite!important}
+
+/* API Key setup panel */
+.rv-key-panel{position:absolute;bottom:172px;right:0;z-index:20;background:#fff;border-radius:14px;padding:14px 15px;width:215px;box-shadow:0 8px 28px rgba(0,0,0,.14);border:1.5px solid #FDE68A}
+.rv-key-panel p{font-size:.74rem;color:#374151;margin:0 0 8px;font-weight:600;line-height:1.4}
+.rv-key-panel input{width:100%;box-sizing:border-box;padding:6px 9px;border-radius:7px;border:1.5px solid #D1D5DB;font-size:.73rem;outline:none;font-family:inherit;color:#111}
+.rv-key-panel input:focus{border-color:#FFC107}
+.rv-key-btns{display:flex;gap:6px;margin-top:8px}
+.rv-key-btns button{flex:1;padding:5px 0;border-radius:7px;border:none;cursor:pointer;font-size:.75rem;font-weight:700;font-family:inherit}
+.rv-key-btns button.ok{background:#FFC107;color:#fff}
+.rv-key-btns button.cancel{background:#F3F4F6;color:#555}
+
+/* Action buttons row */
+.rv-actions{display:flex;gap:6px;justify-content:center;margin-top:7px}
+.rv-report-btn{background:rgba(255,255,255,.92);border:1.5px solid #FDE68A;border-radius:20px;padding:4px 11px;font-size:.72rem;font-weight:700;cursor:pointer;color:#92400E;font-family:inherit;white-space:nowrap;transition:all .15s}
+.rv-report-btn:hover{background:#FFF7E0}
+.rv-key-btn{background:rgba(255,255,255,.92);border:1.5px solid #E5E7EB;border-radius:50%;width:27px;height:27px;font-size:.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.rv-key-btn:hover{background:#F9FAFB}
+
 /* Mobile */
 @media(max-width:768px){
   .app{padding:14px 11px 130px}
@@ -308,10 +329,16 @@ function Donut({tasks}){
 /* WALL-E Avatar */
 function Avatar({tasks}){
   const [talking,setTalking]=useState(false);
+  const [listening,setListening]=useState(false);
   const [tilt,setTilt]=useState(false);
   const [ripple,setRipple]=useState(false);
-  const [bubble,setBubble]=useState('嘟嘟~ 点我听汇报');
+  const [bubble,setBubble]=useState('嘟嘟~ 点我问问题');
   const [bars,setBars]=useState([2,4,2,4,2]);
+  const [apiKey,setApiKey]=useState(()=>localStorage.getItem('rv_api_key')||'');
+  const [showKey,setShowKey]=useState(false);
+  const [keyDraft,setKeyDraft]=useState('');
+  const recogRef=useRef(null);
+  const barTimerRef=useRef(null);
 
   const beep=(freq,dur,delay=0)=>{
     try{
@@ -357,37 +384,96 @@ function Avatar({tasks}){
     return r;
   };
 
-  const speak=()=>{
-    if(!('speechSynthesis' in window)){setBubble('浏览器暂不支持语音');return;}
+  const sayText=(text,onEnd)=>{
+    if(!('speechSynthesis' in window)){onEnd&&onEnd();return;}
     window.speechSynthesis.cancel();
-    walleHello();
-    setTilt(true);setRipple(true);
+    const utt=new SpeechSynthesisUtterance(text);
+    utt.lang='zh-CN';utt.rate=1.1;utt.pitch=1.9;utt.volume=1;
+    const voices=window.speechSynthesis.getVoices();
+    const v=voices.find(v=>v.lang.startsWith('zh')&&(v.name.includes('XiaoXiao')||v.name.includes('Tingting')||v.name.includes('Ting-Ting')))||voices.find(v=>v.lang.startsWith('zh')&&(v.name.includes('Xiao')||v.name.includes('Female')||v.name.includes('女')))||voices.find(v=>v.lang.startsWith('zh'));
+    if(v) utt.voice=v;
+    setTalking(true);setRipple(true);
+    barTimerRef.current=setInterval(()=>setBars([...Array(5)].map(()=>Math.floor(Math.random()*7)+2)),130);
+    utt.onend=()=>{
+      clearInterval(barTimerRef.current);setTalking(false);setRipple(false);setBars([2,4,2,4,2]);
+      walleDone();
+      onEnd&&onEnd();
+    };
+    window.speechSynthesis.speak(utt);
+  };
+
+  const speak=()=>{
+    if(talking){window.speechSynthesis.cancel();clearInterval(barTimerRef.current);setTalking(false);setRipple(false);setBars([2,4,2,4,2]);setBubble('嘟嘟~ 点我问问题');return;}
+    walleHello();setTilt(true);
     const total=tasks.length,done=tasks.filter(t=>t.status==='completed').length;
     const rate=total?Math.round(done/total*100):0;
     setBubble(total===0?'暂无任务，快去添加！':`${total}项任务 · 完成${rate}%`);
     setTimeout(()=>{
-      const utt=new SpeechSynthesisUtterance(genReport());
-      utt.lang='zh-CN';utt.rate=1.1;utt.pitch=1.9;utt.volume=1;
-      const voices=window.speechSynthesis.getVoices();
-      const v=voices.find(v=>v.lang.startsWith('zh')&&(v.name.includes('XiaoXiao')||v.name.includes('Tingting')||v.name.includes('Ting-Ting')))||voices.find(v=>v.lang.startsWith('zh')&&(v.name.includes('Xiao')||v.name.includes('Female')||v.name.includes('女')))||voices.find(v=>v.lang.startsWith('zh'));
-      if(v) utt.voice=v;
-      setTalking(true);
-      const barTimer=setInterval(()=>setBars([...Array(5)].map(()=>Math.floor(Math.random()*7)+2)),130);
-      utt.onend=()=>{
-        clearInterval(barTimer);setTalking(false);setRipple(false);setBars([2,4,2,4,2]);
-        walleDone();
-        setBubble('汇报完毕，随时待命 ✅');
-        setTimeout(()=>{setTilt(false);setBubble('嘟嘟~ 点我听汇报');},3000);
-      };
-      window.speechSynthesis.speak(utt);
+      sayText(genReport(),()=>{setBubble('汇报完毕 ✅');setTimeout(()=>{setTilt(false);setBubble('嘟嘟~ 点我问问题');},3000);});
     },560);
   };
 
+  const askAI=async(question)=>{
+    const ctx=tasks.map(t=>`${t.name}(${t.assignee},${t.status},截止${t.deadline}${t.blocker?',卡点:'+t.blocker:''})`).join(';');
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'x-api-key':apiKey,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-haiku-4-5-20251001',max_tokens:150,
+        system:`你是可爱的工作助手机器人。当前任务：${ctx}。用简短可爱的语气回答老板问题，不超过60字，中文。`,
+        messages:[{role:'user',content:question}]
+      })
+    });
+    const data=await res.json();
+    if(data.error) throw new Error(data.error.message);
+    return data.content[0].text;
+  };
+
+  const startListening=()=>{
+    if(listening){recogRef.current&&recogRef.current.abort();setListening(false);setBubble('嘟嘟~ 点我问问题');return;}
+    if(!apiKey){setKeyDraft('');setShowKey(true);return;}
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!SR){setBubble('浏览器不支持语音识别');return;}
+    window.speechSynthesis.cancel();
+    const r=new SR();r.lang='zh-CN';r.interimResults=false;r.maxAlternatives=1;
+    recogRef.current=r;
+    setListening(true);setTilt(true);setBubble('说吧，我在听...');
+    beep(1047,.06,0);beep(1319,.06,.1);
+    r.onresult=async(e)=>{
+      const q=e.results[0][0].transcript;
+      setListening(false);setBubble(`"${q}"`);
+      try{
+        const ans=await askAI(q);
+        setBubble(ans);
+        sayText(ans,()=>{setBubble('还有问题吗？点我继续');setTimeout(()=>{setTilt(false);setBubble('嘟嘟~ 点我问问题');},4000);});
+      }catch(err){
+        setTalking(false);setRipple(false);
+        setBubble('哎呀连不上AI，检查一下Key？');
+        setTimeout(()=>setBubble('嘟嘟~ 点我问问题'),3000);
+      }
+    };
+    r.onerror=()=>{setListening(false);setBubble('没听清，再说一次？');setTimeout(()=>setBubble('嘟嘟~ 点我问问题'),2000);};
+    r.onend=()=>setListening(false);
+    r.start();
+  };
+
+  const saveKey=()=>{const k=keyDraft.trim();if(k){localStorage.setItem('rv_api_key',k);setApiKey(k);}setShowKey(false);};
+
   return(
-    <div className="av-wrap" onClick={speak} title="点击收听工作汇报">
+    <div className="av-wrap" title="点击机器人问问题">
       <div className="av-bubble">{bubble}</div>
       {ripple&&<div className="av-ripple"/>}
-      <div className={`rv${talking?' talking':''}`}>
+      {showKey&&(
+        <div className="rv-key-panel">
+          <p>输入 Claude API Key<br/>开启语音问答功能</p>
+          <input value={keyDraft} onChange={e=>setKeyDraft(e.target.value)} placeholder="sk-ant-..." onKeyDown={e=>e.key==='Enter'&&saveKey()}/>
+          <div className="rv-key-btns">
+            <button className="ok" onClick={saveKey}>确定</button>
+            <button className="cancel" onClick={()=>setShowKey(false)}>取消</button>
+          </div>
+        </div>
+      )}
+      <div className={`rv${talking?' talking':''}${listening?' listening':''}`} onClick={startListening}>
         {/* Big Wheels */}
         <div className="rv-wheel l"><div className="rv-hub"/><div className="rv-spoke h"/><div className="rv-spoke v"/></div>
         <div className="rv-wheel r"><div className="rv-hub"/><div className="rv-spoke h"/><div className="rv-spoke v"/></div>
@@ -416,6 +502,10 @@ function Avatar({tasks}){
           {/* Speaker VU bars */}
           <div className="rv-grille">{bars.map((h,i)=><div key={i} className="rv-bar" style={{height:`${h}px`}}/>)}</div>
         </div>
+      </div>
+      <div className="rv-actions">
+        <button className="rv-report-btn" onClick={e=>{e.stopPropagation();speak();}}>📊 听汇报</button>
+        <button className="rv-key-btn" onClick={e=>{e.stopPropagation();setKeyDraft(apiKey);setShowKey(v=>!v);}} title="设置API Key">⚙️</button>
       </div>
     </div>
   );
