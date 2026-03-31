@@ -244,6 +244,19 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .vf-key-acts button{flex:1;padding:6px 0;border-radius:7px;border:none;cursor:pointer;font-size:.76rem;font-weight:700;font-family:inherit}
 .vf-key-acts button.ok{background:#22C55E;color:#fff}
 .vf-key-acts button.cancel{background:#F3F4F6;color:#555}
+.vf-picker{position:absolute;bottom:86px;left:50%;transform:translateX(-50%);z-index:21;background:#fff;border-radius:14px;padding:14px 14px 10px;width:270px;box-shadow:0 8px 32px rgba(0,0,0,.16);border:1.5px solid #E5E7EB}
+.vf-picker-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.vf-picker-head span{font-size:.8rem;font-weight:700;color:#111827}
+.vf-picker-head button{background:none;border:none;cursor:pointer;font-size:.85rem;color:#9CA3AF;padding:0}
+.vf-voice-list{display:flex;flex-direction:column;gap:4px;max-height:240px;overflow-y:auto}
+.vf-voice-item{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:9px;cursor:pointer;border:1.5px solid transparent;transition:all .12s}
+.vf-voice-item:hover{background:#F9FAFB}
+.vf-voice-item.active{background:#F0FDF4;border-color:#86EFAC}
+.vf-voice-info{flex:1;display:flex;flex-direction:column;gap:2px}
+.vf-voice-name{font-size:.76rem;font-weight:600;color:#111827}
+.vf-voice-lang{font-size:.65rem;color:#9CA3AF}
+.vf-preview-btn{font-size:.7rem;padding:3px 9px;border-radius:5px;border:1px solid #D1D5DB;background:#fff;cursor:pointer;color:#374151;font-family:inherit;white-space:nowrap}
+.vf-preview-btn.playing{background:#DBEAFE;border-color:#93C5FD;color:#1D4ED8}
 
 /* ── Listening pulse ── */
 @keyframes rvListen{0%,100%{filter:drop-shadow(0 0 6px rgba(91,192,232,.5))}50%{filter:drop-shadow(0 0 22px rgba(91,192,232,1))}}
@@ -348,7 +361,7 @@ function Donut({tasks}){
   );
 }
 
-/* shared TTS helper — pitch=2, waits for voices to load */
+/* shared TTS helper — uses saved voice, pitch=2 */
 function makeTTS(text,{pitch=2,rate=1.1}={}){
   return new Promise(resolve=>{
     if(!window.speechSynthesis){resolve();return;}
@@ -356,18 +369,76 @@ function makeTTS(text,{pitch=2,rate=1.1}={}){
     const utt=new SpeechSynthesisUtterance(text);
     utt.lang='zh-CN';utt.rate=rate;utt.pitch=pitch;utt.volume=1;
     utt.onend=resolve;utt.onerror=resolve;
+    const savedName=localStorage.getItem('rv_voice_name');
     const apply=()=>{
       const vs=window.speechSynthesis.getVoices();
-      const v=vs.find(v=>v.lang.startsWith('zh')&&(v.name.includes('XiaoXiao')||v.name.includes('Tingting')))||
-              vs.find(v=>v.lang.startsWith('zh')&&(v.name.includes('Xiao')||v.name.includes('Female')||v.name.includes('女')))||
-              vs.find(v=>v.lang.startsWith('zh'));
+      let v=savedName?vs.find(x=>x.name===savedName):null;
+      if(!v) v=vs.find(x=>x.lang.startsWith('zh')&&(x.name.includes('XiaoXiao')||x.name.includes('Tingting')))||
+                vs.find(x=>x.lang.startsWith('zh')&&(x.name.includes('Xiao')||x.name.includes('Female')||x.name.includes('女')))||
+                vs.find(x=>x.lang.startsWith('zh'));
       if(v) utt.voice=v;
       window.speechSynthesis.speak(utt);
     };
     const vs=window.speechSynthesis.getVoices();
     if(vs.length>0) apply();
-    else{window.speechSynthesis.addEventListener('voiceschanged',apply,{once:true});}
+    else window.speechSynthesis.addEventListener('voiceschanged',apply,{once:true});
   });
+}
+
+/* Voice Picker — lists all zh voices for selection */
+function VoicePicker({onClose}){
+  const [voices,setVoices]=useState([]);
+  const [sel,setSel]=useState(()=>localStorage.getItem('rv_voice_name')||'');
+  const [previewing,setPreviewing]=useState('');
+
+  useEffect(()=>{
+    const load=()=>{
+      const vs=window.speechSynthesis.getVoices().filter(v=>v.lang.startsWith('zh'));
+      setVoices(vs);
+    };
+    load();
+    window.speechSynthesis.addEventListener('voiceschanged',load);
+    return()=>window.speechSynthesis.removeEventListener('voiceschanged',load);
+  },[]);
+
+  const preview=(v)=>{
+    window.speechSynthesis.cancel();
+    setPreviewing(v.name);
+    const utt=new SpeechSynthesisUtterance('你好老板，我是你的专属助手！');
+    utt.voice=v;utt.lang=v.lang;utt.pitch=2;utt.rate=1.1;utt.volume=1;
+    utt.onend=()=>setPreviewing('');
+    window.speechSynthesis.speak(utt);
+  };
+
+  const pick=(v)=>{
+    localStorage.setItem('rv_voice_name',v.name);
+    setSel(v.name);
+  };
+
+  return(
+    <div className="vf-picker">
+      <div className="vf-picker-head">
+        <span>选择语音</span>
+        <button onClick={onClose}>✕</button>
+      </div>
+      {voices.length===0&&<div style={{fontSize:'.76rem',color:'#9CA3AF',textAlign:'center',padding:'12px 0'}}>加载中...</div>}
+      <div className="vf-voice-list">
+        {voices.map(v=>(
+          <div key={v.name} className={`vf-voice-item${sel===v.name?' active':''}`} onClick={()=>pick(v)}>
+            <div className="vf-voice-info">
+              <span className="vf-voice-name">{v.name.replace(/^Microsoft\s+/,'').replace(/\s*Online.*$/,'')}</span>
+              <span className="vf-voice-lang">{v.lang}</span>
+            </div>
+            <button className={`vf-preview-btn${previewing===v.name?' playing':''}`}
+              onClick={e=>{e.stopPropagation();preview(v);}}>
+              {previewing===v.name?'▶':'试听'}
+            </button>
+          </div>
+        ))}
+      </div>
+      <div style={{fontSize:'.7rem',color:'#9CA3AF',marginTop:8,textAlign:'center'}}>点击行选择 · 试听按钮预览</div>
+    </div>
+  );
 }
 
 /* shared beep */
@@ -460,6 +531,7 @@ function VoiceFloat({tasks}){
   const [bars,setBars]=useState([3,5,3,5,3]);
   const [apiKey,setApiKey]=useState(()=>localStorage.getItem('rv_api_key')||'');
   const [showKey,setShowKey]=useState(false);
+  const [showVoice,setShowVoice]=useState(false);
   const [keyDraft,setKeyDraft]=useState('');
   const recogRef=useRef(null);
   const barTimerRef=useRef(null);
@@ -539,8 +611,13 @@ function VoiceFloat({tasks}){
             <button className="ok" onClick={saveKey}>确定</button>
             <button className="cancel" onClick={()=>setShowKey(false)}>取消</button>
           </div>
+          <div style={{marginTop:10,borderTop:'1px solid #F3F4F6',paddingTop:10}}>
+            <button style={{width:'100%',padding:'6px 0',borderRadius:7,border:'1.5px solid #E5E7EB',background:'#F9FAFB',cursor:'pointer',fontSize:'.75rem',fontWeight:700,fontFamily:'inherit',color:'#374151'}}
+              onClick={()=>{setShowKey(false);setShowVoice(true);}}>🎵 选择语音包</button>
+          </div>
         </div>
       )}
+      {showVoice&&<VoicePicker onClose={()=>setShowVoice(false)}/>}
       <div className={statusClass}>{status}</div>
       <div style={{position:'relative',display:'inline-block'}}>
         <button className={btnClass}
@@ -550,7 +627,7 @@ function VoiceFloat({tasks}){
             <div className="vf-bars">{bars.map((h,i)=><div key={i} className="vf-bar" style={{height:`${h}px`}}/>)}</div>
           )}
         </button>
-        <button className="vf-key-btn" onClick={e=>{e.stopPropagation();setKeyDraft(apiKey);setShowKey(v=>!v);}} title="设置API Key">⚙️</button>
+        <button className="vf-key-btn" onClick={e=>{e.stopPropagation();if(showVoice){setShowVoice(false);}else{setKeyDraft(apiKey);setShowKey(v=>!v);}}} title="设置">⚙️</button>
       </div>
     </div>
   );
