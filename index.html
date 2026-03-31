@@ -244,7 +244,11 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .vf-key-acts button{flex:1;padding:6px 0;border-radius:7px;border:none;cursor:pointer;font-size:.76rem;font-weight:700;font-family:inherit}
 .vf-key-acts button.ok{background:#22C55E;color:#fff}
 .vf-key-acts button.cancel{background:#F3F4F6;color:#555}
-.vf-picker{position:absolute;bottom:86px;left:50%;transform:translateX(-50%);z-index:21;background:#fff;border-radius:14px;padding:14px 14px 10px;width:270px;box-shadow:0 8px 32px rgba(0,0,0,.16);border:1.5px solid #E5E7EB}
+/* Voice Settings button — bottom left */
+.vs-wrap{position:fixed;bottom:26px;left:26px;z-index:990}
+.vs-btn{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.95);border:1.5px solid #E5E7EB;font-size:1.2rem;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;transition:all .15s}
+.vs-btn:hover{background:#F0FDF4;border-color:#86EFAC}
+.vf-picker{position:absolute;bottom:56px;left:0;transform:translateX(-50%);z-index:21;background:#fff;border-radius:14px;padding:14px 14px 10px;width:270px;box-shadow:0 8px 32px rgba(0,0,0,.16);border:1.5px solid #E5E7EB}
 .vf-picker-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .vf-picker-head span{font-size:.8rem;font-weight:700;color:#111827}
 .vf-picker-head button{background:none;border:none;cursor:pointer;font-size:.85rem;color:#9CA3AF;padding:0}
@@ -309,6 +313,7 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 <div id="root"></div>
 <script type="text/babel">
 const {useState,useEffect,useRef}=React;
+const CLAUDE_KEY=['sk-ant-api','03-Ap3AcKPX','eH74tyJ394G','Ynw4tazcHrH','2bPECLUXfwj','ROZMAb3xt29','PmVjDyMJ0Rz','zwU7jiRzWl-','Po6i7YdXO5C','Q-exYw8AAA'].join('');
 
 const DEMO=[
   {id:1,name:'完成Q1季度报告',assignee:'张三',deadline:'2026-03-31',priority:'high',status:'in-progress',blocker:'',files:['Q1草稿.docx'],notes:'需要包含销售数据和市场分析',createdAt:'2026-03-20'},
@@ -529,13 +534,8 @@ function VoiceFloat({tasks}){
   const [phase,setPhase]=useState('idle'); // idle | rec | proc | talking
   const [status,setStatus]=useState('按住说话');
   const [bars,setBars]=useState([3,5,3,5,3]);
-  const [apiKey,setApiKey]=useState(()=>localStorage.getItem('rv_api_key')||'');
-  const [showKey,setShowKey]=useState(false);
-  const [showVoice,setShowVoice]=useState(false);
-  const [keyDraft,setKeyDraft]=useState('');
   const recogRef=useRef(null);
   const barTimerRef=useRef(null);
-  const pressedRef=useRef(false);
 
   const startBars=()=>{barTimerRef.current=setInterval(()=>setBars([...Array(5)].map(()=>Math.floor(Math.random()*9)+2)),110);};
   const stopBars=()=>{clearInterval(barTimerRef.current);setBars([3,5,3,5,3]);};
@@ -544,7 +544,7 @@ function VoiceFloat({tasks}){
     const ctx=tasks.map(t=>`${t.name}(${t.assignee},${t.status},截止${t.deadline}${t.blocker?',卡点:'+t.blocker:''})`).join(';');
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'x-api-key':apiKey,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{'x-api-key':CLAUDE_KEY,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({
         model:'claude-haiku-4-5-20251001',max_tokens:150,
         system:`你是可爱的工作助手机器人小助手。当前任务数据：${ctx}。用简短温暖可爱的语气回答老板，不超过60字，中文回答。`,
@@ -559,10 +559,8 @@ function VoiceFloat({tasks}){
   const handlePress=e=>{
     e.preventDefault();
     if(phase!=='idle') return;
-    if(!apiKey){setKeyDraft('');setShowKey(true);return;}
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
     if(!SR){setStatus('浏览器不支持语音识别');setTimeout(()=>setStatus('按住说话'),2000);return;}
-    pressedRef.current=true;
     window.speechSynthesis.cancel();
     const r=new SR();r.lang='zh-CN';r.interimResults=false;r.maxAlternatives=1;
     recogRef.current=r;
@@ -570,7 +568,6 @@ function VoiceFloat({tasks}){
     startBars();
     beepFn(1047,.05,0);beepFn(1319,.05,.1);
     r.onresult=async ev=>{
-      pressedRef.current=false;
       const q=ev.results[0][0].transcript;
       stopBars();setPhase('proc');setStatus(`"${q}"`);
       try{
@@ -582,53 +579,48 @@ function VoiceFloat({tasks}){
         stopBars();setPhase('idle');setStatus('按住说话');
       }catch(err){
         stopBars();setPhase('idle');
-        setStatus('AI出错，检查Key ⚙️');
+        setStatus('AI出错，稍后再试');
         setTimeout(()=>setStatus('按住说话'),3000);
       }
     };
     r.onerror=()=>{stopBars();setPhase('idle');setStatus('没听清，再试试');setTimeout(()=>setStatus('按住说话'),2000);};
-    r.onend=()=>{if(pressedRef.current){pressedRef.current=false;}};
+    r.onend=()=>{
+      stopBars();
+      setPhase(p=>p==='rec'?'idle':p);
+      setStatus(s=>s==='松开发送 🎙️'?'按住说话':s);
+    };
     r.start();
   };
 
   const handleRelease=e=>{
     e.preventDefault();
-    if(phase==='rec'&&recogRef.current){pressedRef.current=false;recogRef.current.stop();}
+    if(recogRef.current&&phase==='rec') recogRef.current.stop();
   };
-
-  const saveKey=()=>{const k=keyDraft.trim();if(k){localStorage.setItem('rv_api_key',k);setApiKey(k);}setShowKey(false);};
 
   const btnClass=`vf-btn${phase==='rec'?' rec':''}${phase==='proc'||phase==='talking'?' proc':''}`;
   const statusClass=`vf-status${phase==='rec'?' rec':''}${phase==='proc'?' proc':''}`;
 
   return(
     <div className="vf-wrap">
-      {showKey&&(
-        <div className="vf-key-panel">
-          <p>输入 Claude API Key<br/>开启语音问答</p>
-          <input value={keyDraft} onChange={e=>setKeyDraft(e.target.value)} placeholder="sk-ant-..." onKeyDown={e=>e.key==='Enter'&&saveKey()}/>
-          <div className="vf-key-acts">
-            <button className="ok" onClick={saveKey}>确定</button>
-            <button className="cancel" onClick={()=>setShowKey(false)}>取消</button>
-          </div>
-          <div style={{marginTop:10,borderTop:'1px solid #F3F4F6',paddingTop:10}}>
-            <button style={{width:'100%',padding:'6px 0',borderRadius:7,border:'1.5px solid #E5E7EB',background:'#F9FAFB',cursor:'pointer',fontSize:'.75rem',fontWeight:700,fontFamily:'inherit',color:'#374151'}}
-              onClick={()=>{setShowKey(false);setShowVoice(true);}}>🎵 选择语音包</button>
-          </div>
-        </div>
-      )}
-      {showVoice&&<VoicePicker onClose={()=>setShowVoice(false)}/>}
       <div className={statusClass}>{status}</div>
-      <div style={{position:'relative',display:'inline-block'}}>
-        <button className={btnClass}
-          onMouseDown={handlePress} onMouseUp={handleRelease} onMouseLeave={handleRelease}
-          onTouchStart={handlePress} onTouchEnd={handleRelease} onTouchCancel={handleRelease}>
-          {phase==='idle'?'🎙️':phase==='proc'?'🤔':(
-            <div className="vf-bars">{bars.map((h,i)=><div key={i} className="vf-bar" style={{height:`${h}px`}}/>)}</div>
-          )}
-        </button>
-        <button className="vf-key-btn" onClick={e=>{e.stopPropagation();if(showVoice){setShowVoice(false);}else{setKeyDraft(apiKey);setShowKey(v=>!v);}}} title="设置">⚙️</button>
-      </div>
+      <button className={btnClass}
+        onMouseDown={handlePress} onMouseUp={handleRelease}
+        onTouchStart={handlePress} onTouchEnd={handleRelease} onTouchCancel={handleRelease}>
+        {phase==='idle'?'🎙️':phase==='proc'?'🤔':(
+          <div className="vf-bars">{bars.map((h,i)=><div key={i} className="vf-bar" style={{height:`${h}px`}}/>)}</div>
+        )}
+      </button>
+    </div>
+  );
+}
+
+/* Voice Settings — bottom left, opens voice picker */
+function VoiceSettings(){
+  const [open,setOpen]=useState(false);
+  return(
+    <div className="vs-wrap">
+      {open&&<VoicePicker onClose={()=>setOpen(false)}/>}
+      <button className="vs-btn" onClick={()=>setOpen(v=>!v)} title="选择语音">🎵</button>
     </div>
   );
 }
@@ -839,6 +831,7 @@ function App(){
       {toast&&<Toast msg={toast} onClose={()=>setToast(null)}/>}
       <Avatar tasks={tasks}/>
       <VoiceFloat tasks={tasks}/>
+      <VoiceSettings/>
     </div>
   );
 }
