@@ -558,49 +558,73 @@ function VoiceFloat({tasks}){
     return d.content[0].text;
   };
 
-  const handlePress=e=>{
+  const handleClick=e=>{
     e.preventDefault();
-    if(isRecRef.current||phase!=='idle') return;
+    // 如果正在说话/处理中，点击取消
+    if(phase==='talking'||phase==='proc'){
+      window.speechSynthesis.cancel();
+      stopBars();setPhase('idle');setStatus('点击开始说话');return;
+    }
+    // 如果正在录音，停止
+    if(phase==='rec'){
+      if(recogRef.current) recogRef.current.stop();
+      return;
+    }
+    // 开始录音
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    if(!SR){setStatus('浏览器不支持语音识别');setTimeout(()=>setStatus('按住说话'),2000);return;}
+    if(!SR){setStatus('请用Chrome浏览器');setTimeout(()=>setStatus('点击开始说话'),2000);return;}
     window.speechSynthesis.cancel();
-    const r=new SR();r.lang='zh-CN';r.interimResults=false;r.maxAlternatives=1;
+    const r=new SR();
+    r.lang='zh-CN';
+    r.continuous=false;
+    r.interimResults=true;  // 显示实时识别结果
+    r.maxAlternatives=1;
     recogRef.current=r;
-    isRecRef.current=true;
     gotResultRef.current=false;
-    setPhase('rec');setStatus('松开发送 🎙️');
+    setPhase('rec');setStatus('说吧，说完自动发送...');
     startBars();
     beepFn(1047,.05,0);beepFn(1319,.05,.1);
-    r.onresult=async ev=>{
-      gotResultRef.current=true;
-      isRecRef.current=false;
-      const q=ev.results[0][0].transcript;
-      stopBars();setPhase('proc');setStatus(`"${q}"`);
-      try{
-        const ans=await askAI(q);
-        setPhase('talking');setStatus(ans.length>22?ans.slice(0,22)+'…':ans);
-        startBars();
-        beepFn(1047,.05,0);beepFn(1319,.06,.1);
-        await makeTTS(ans);
-        stopBars();setPhase('idle');setStatus('按住说话');
-      }catch(err){
-        stopBars();setPhase('idle');
-        setStatus('AI出错，稍后再试');
-        setTimeout(()=>setStatus('按住说话'),3000);
+
+    r.onresult=ev=>{
+      // 显示实时识别文字
+      const transcript=Array.from(ev.results).map(r=>r[0].transcript).join('');
+      const isFinal=ev.results[ev.results.length-1].isFinal;
+      setStatus(`"${transcript}"`);
+      if(isFinal){
+        gotResultRef.current=true;
+        stopBars();setPhase('proc');
+        askAI(transcript).then(ans=>{
+          setPhase('talking');setStatus(ans.length>28?ans.slice(0,28)+'…':ans);
+          startBars();
+          beepFn(1047,.05,0);beepFn(1319,.06,.1);
+          makeTTS(ans).then(()=>{
+            stopBars();setPhase('idle');setStatus('点击开始说话');
+          });
+        }).catch(err=>{
+          stopBars();setPhase('idle');
+          setStatus('出错：'+err.message.slice(0,20));
+          setTimeout(()=>setStatus('点击开始说话'),4000);
+        });
       }
     };
-    r.onerror=()=>{isRecRef.current=false;gotResultRef.current=false;stopBars();setPhase('idle');setStatus('没听清，再试试');setTimeout(()=>setStatus('按住说话'),2000);};
-    r.onend=()=>{
-      isRecRef.current=false;
-      if(!gotResultRef.current){stopBars();setPhase('idle');setStatus('按住说话');}
-      gotResultRef.current=false;
-    };
-    r.start();
-  };
 
-  const handleRelease=e=>{
-    e.preventDefault();
-    if(recogRef.current&&isRecRef.current) recogRef.current.stop(); // 用ref不用闭包
+    r.onerror=ev=>{
+      stopBars();setPhase('idle');
+      const msg={
+        'no-speech':'没检测到声音，再试试',
+        'audio-capture':'麦克风无法访问',
+        'not-allowed':'请允许麦克风权限',
+        'network':'网络错误',
+      }[ev.error]||('识别错误:'+ev.error);
+      setStatus(msg);
+      setTimeout(()=>setStatus('点击开始说话'),3000);
+    };
+
+    r.onend=()=>{
+      if(!gotResultRef.current){stopBars();setPhase('idle');setStatus('点击开始说话');}
+    };
+
+    r.start();
   };
 
   const btnClass=`vf-btn${phase==='rec'?' rec':''}${phase==='proc'||phase==='talking'?' proc':''}`;
@@ -609,9 +633,7 @@ function VoiceFloat({tasks}){
   return(
     <div className="vf-wrap">
       <div className={statusClass}>{status}</div>
-      <button className={btnClass}
-        onMouseDown={handlePress} onMouseUp={handleRelease}
-        onTouchStart={handlePress} onTouchEnd={handleRelease} onTouchCancel={handleRelease}>
+      <button className={btnClass} onClick={handleClick}>
         {phase==='idle'?'🎙️':phase==='proc'?'🤔':(
           <div className="vf-bars">{bars.map((h,i)=><div key={i} className="vf-bar" style={{height:`${h}px`}}/>)}</div>
         )}
