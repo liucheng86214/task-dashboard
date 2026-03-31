@@ -135,62 +135,93 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 @keyframes slideIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
 .toast{position:fixed;top:18px;right:18px;z-index:9999;padding:11px 18px;border-radius:10px;background:#fff;box-shadow:0 6px 24px rgba(0,0,0,.12);display:flex;align-items:center;gap:7px;animation:slideIn .25s ease;font-size:.85rem;font-weight:600;border-left:3px solid var(--g2)}
 
-/* ========= WALL-E AVATAR ========= */
-@keyframes walleFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-@keyframes walleBlink{0%,78%,100%{transform:scaleY(1)}86%{transform:scaleY(0.06)}}
-@keyframes walleTilt{0%,55%,100%{transform:rotate(0deg) translateX(-50%)}68%{transform:rotate(-20deg) translateX(-50%)}80%{transform:rotate(14deg) translateX(-50%)}}
-@keyframes walleLens{0%,100%{box-shadow:0 0 6px rgba(91,184,232,.5)}50%{box-shadow:0 0 14px rgba(91,184,232,.9),0 0 4px #fff}}
-@keyframes walleRipple{0%{transform:scale(.8);opacity:1}100%{transform:scale(2.4);opacity:0}}
-@keyframes redBlink{0%,100%{opacity:1;box-shadow:0 0 4px currentColor}50%{opacity:.2;box-shadow:none}}
+/* ========= ROBOT v3 ========= */
+@keyframes rvFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes rvBlink{0%,80%,100%{transform:scaleY(1)}87%{transform:scaleY(0.06)}}
+@keyframes rvTilt{0%,58%,100%{transform:rotate(0deg) translateX(-50%)}70%{transform:rotate(-22deg) translateX(-50%)}84%{transform:rotate(15deg) translateX(-50%)}}
+@keyframes rvLens{0%,100%{box-shadow:0 0 8px rgba(91,192,232,.5)}50%{box-shadow:0 0 18px rgba(91,192,232,.95),0 0 5px #fff}}
+@keyframes rvRipple{0%{transform:scale(.8);opacity:1}100%{transform:scale(2.4);opacity:0}}
+@keyframes rvLed{0%,100%{opacity:1;box-shadow:0 0 5px currentColor}50%{opacity:.15;box-shadow:none}}
+@keyframes rvArmLIdle{0%,100%{transform:rotate(22deg)}50%{transform:rotate(12deg)}}
+@keyframes rvArmRIdle{0%,100%{transform:rotate(-22deg)}50%{transform:rotate(-12deg)}}
+@keyframes rvArmLTalk{0%{transform:rotate(-65deg)}35%{transform:rotate(-20deg)}65%{transform:rotate(-50deg)}100%{transform:rotate(-65deg)}}
+@keyframes rvArmRTalk{0%,100%{transform:rotate(-55deg)}50%{transform:rotate(15deg)}}
+@keyframes rvBodyBob{0%,100%{transform:translateY(0)}45%{transform:translateY(-5px)}}
+@keyframes rvHeadNod{0%,100%{transform:rotate(0)}50%{transform:rotate(-9deg)}}
+@keyframes rvWheelSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 
 .av-wrap{position:fixed;bottom:26px;right:26px;z-index:1000;cursor:pointer;user-select:none}
-.av-bubble{position:absolute;bottom:144px;right:0;background:#fff;border-radius:14px 14px 0 14px;padding:10px 13px;width:178px;font-size:.78rem;line-height:1.5;color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.1);border:1.5px solid #FDE68A;animation:walleFloat 3.2s ease-in-out infinite}
-.av-ripple{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:112px;height:112px;border-radius:50%;background:rgba(212,152,10,.15);animation:walleRipple 1.4s ease-out infinite;pointer-events:none}
+.av-bubble{position:absolute;bottom:158px;right:0;background:#fff;border-radius:14px 14px 0 14px;padding:10px 13px;width:178px;font-size:.78rem;line-height:1.5;color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.1);border:1.5px solid #FDE68A;animation:rvFloat 3.2s ease-in-out infinite}
+.av-ripple{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:120px;height:120px;border-radius:50%;background:rgba(212,152,10,.14);animation:rvRipple 1.4s ease-out infinite;pointer-events:none}
 
-/* WALL-E character */
-.walle{width:90px;height:130px;position:relative;overflow:visible;animation:walleFloat 3.2s ease-in-out infinite;filter:drop-shadow(0 8px 22px rgba(160,110,0,.32))}
+/* Character container */
+.rv{width:110px;height:158px;position:relative;overflow:visible;animation:rvFloat 3.2s ease-in-out infinite;filter:drop-shadow(0 10px 24px rgba(150,100,0,.3))}
 
-/* Caterpillar tracks */
-.wt{position:absolute;bottom:0;left:1px;width:88px;height:17px;background:#1A1A1A;border-radius:8px;overflow:hidden}
-.wt::before{content:'';position:absolute;top:4px;left:5px;right:5px;height:9px;background:repeating-linear-gradient(90deg,#2C2C2C 0,#2C2C2C 10px,#111 10px,#111 20px);border-radius:4px}
-.wt-w{position:absolute;top:50%;transform:translateY(-50%);width:11px;height:11px;background:#2E2E2E;border-radius:50%;border:1px solid #444}
-.wt-w.l{left:7px}
-.wt-w.r{right:7px}
+/* ── Big wheels ── */
+.rv-wheel{position:absolute;bottom:0;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#444,#181818);border:3px solid #2A2A2A;box-shadow:inset 0 0 0 6px #1E1E1E,0 3px 8px rgba(0,0,0,.5)}
+.rv-wheel.l{left:2px}
+.rv-wheel.r{right:2px}
+/* Hub */
+.rv-hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:15px;height:15px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#666,#333);border:2px solid #777}
+/* Spokes */
+.rv-spoke{position:absolute;top:50%;left:50%;background:#2E2E2E;border-radius:2px}
+.rv-spoke.h{width:36px;height:3px;transform:translate(-50%,-50%)}
+.rv-spoke.v{width:3px;height:36px;transform:translate(-50%,-50%)}
+/* Axle bar */
+.rv-axle{position:absolute;bottom:21px;left:24px;right:24px;height:5px;background:#222;border-radius:3px;box-shadow:0 2px 4px rgba(0,0,0,.4)}
 
-/* Body block */
-.wb{position:absolute;bottom:15px;left:9px;width:72px;height:50px;background:linear-gradient(160deg,#E0A40C 0%,#C88A09 50%,#A67208 100%);border-radius:6px;border:2px solid #7A5408;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -2px 0 rgba(0,0,0,.18)}
-/* Horizontal seam line */
-.wb::before{content:'';position:absolute;top:50%;left:5px;right:5px;height:1px;background:rgba(0,0,0,.22)}
-/* Body panel with LEDs */
-.wbp{position:absolute;top:7px;left:50%;transform:translateX(-50%);width:46px;height:18px;background:#7A5408;border-radius:3px;border:1px solid #5C3D06;display:flex;align-items:center;justify-content:center;gap:7px}
-.wbpl{width:9px;height:9px;border-radius:50%}
-.wbpl.r{color:#E74C3C;background:#E74C3C;box-shadow:0 0 5px #E74C3C;animation:redBlink 1.6s ease-in-out infinite}
-.wbpl.g{color:#27AE60;background:#27AE60;box-shadow:0 0 5px #27AE60;animation:redBlink 2.2s ease-in-out infinite .7s}
+/* ── Body ── */
+.rv-body{position:absolute;bottom:42px;left:16px;width:78px;height:52px;background:linear-gradient(155deg,#FFE040 0%,#FFC107 55%,#E6A000 100%);border-radius:8px;border:2.5px solid #C88A00;box-shadow:inset 0 2px 0 rgba(255,255,255,.22),inset 0 -2px 0 rgba(0,0,0,.16)}
+.rv-body::before{content:'';position:absolute;top:50%;left:6px;right:6px;height:1px;background:rgba(0,0,0,.18)}
+.rv-bp{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:48px;height:20px;background:#111;border-radius:4px;border:1.5px solid #FFD700;display:flex;align-items:center;justify-content:center;gap:8px}
+.rv-led{width:9px;height:9px;border-radius:50%}
+.rv-led.r{color:#E74C3C;background:#E74C3C;box-shadow:0 0 5px #E74C3C;animation:rvLed 1.4s ease-in-out infinite}
+.rv-led.g{color:#2ECC71;background:#2ECC71;box-shadow:0 0 5px #2ECC71;animation:rvLed 2s ease-in-out infinite .65s}
 
-/* Head block */
-.wh{position:absolute;bottom:63px;left:9px;width:72px;height:42px;background:linear-gradient(145deg,#DDA00C,#C88A09);border-radius:6px;border:2px solid #7A5408;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -1px 0 rgba(0,0,0,.14);overflow:visible}
-.wh::after{content:'';position:absolute;bottom:9px;left:8px;right:8px;height:1px;background:rgba(0,0,0,.18)}
-/* Corner rivets */
-.wr{position:absolute;width:5px;height:5px;background:#7A5408;border-radius:50%;top:4px}
-.wr.l{left:5px}
-.wr.r{right:5px}
+/* ── Head ── */
+.rv-head{position:absolute;bottom:92px;left:16px;width:78px;height:46px;background:linear-gradient(145deg,#FFE040,#FFC107);border-radius:8px;border:2.5px solid #C88A00;box-shadow:inset 0 2px 0 rgba(255,255,255,.2),inset 0 -1px 0 rgba(0,0,0,.14);overflow:visible}
+.rv-head::after{content:'';position:absolute;bottom:10px;left:8px;right:8px;height:1px;background:rgba(0,0,0,.15)}
+.rv-rv{position:absolute;width:5px;height:5px;background:#B8860B;border-radius:50%;top:5px}
+.rv-rv.l{left:6px}
+.rv-rv.r{right:6px}
+/* VU speaker bars */
+.rv-grille{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);display:flex;gap:3px;align-items:flex-end}
+.rv-bar{width:3px;background:rgba(0,0,0,.3);border-radius:1px;min-height:2px;transition:height .09s}
 
-/* Speaker bars (VU meter when talking) */
-.whs{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);display:flex;gap:3px;align-items:flex-end}
-.whsg{width:3px;background:rgba(0,0,0,.35);border-radius:1px;min-height:2px;transition:height .08s}
+/* ── Big binocular eyes (36px) ── */
+.rv-eyes{position:absolute;top:-40px;left:50%;transform:translateX(-50%);display:flex;gap:5px;transform-origin:50% 100%}
+.rv-eyes.tilt{animation:rvTilt 5.5s ease-in-out infinite 1.5s}
+.rv-ebridge{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:62px;height:6px;background:#2A2A2A;border-radius:3px;z-index:0}
+.rv-eu{width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#545454,#1A1A1A);border:3.5px solid #3C3C3C;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.1);position:relative;z-index:1}
+.rv-iris{width:26px;height:26px;border-radius:50%;background:#050D15;display:flex;align-items:center;justify-content:center;animation:rvBlink 5.5s ease-in-out infinite}
+.rv-lens{width:17px;height:17px;border-radius:50%;background:radial-gradient(circle at 32% 28%,#D8EEFA,#5BC0E8 38%,#1267A8 78%,#062840 100%);box-shadow:0 0 10px rgba(91,192,232,.65);position:relative;animation:rvLens 2.8s ease-in-out infinite}
+.rv-lens::after{content:'';position:absolute;width:5px;height:5px;background:rgba(255,255,255,.9);border-radius:50%;top:2px;right:2px}
 
-/* EYE ASSEMBLY — the iconic WALL-E binoculars */
-.we{position:absolute;top:-30px;left:50%;transform:translateX(-50%);display:flex;gap:4px;transform-origin:50% 100%}
-.we.tilt{animation:walleTilt 5.5s ease-in-out infinite 1.5s}
-/* Eye bridge connector */
-.web{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:52px;height:5px;background:#2A2A2A;border-radius:2px;z-index:0}
-/* Single eye cylinder */
-.weu{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#585858,#1E1E1E);border:3px solid #3A3A3A;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 8px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08);position:relative;z-index:1}
-/* Iris */
-.wei{width:21px;height:21px;border-radius:50%;background:#080E14;display:flex;align-items:center;justify-content:center;animation:walleBlink 5.5s ease-in-out infinite}
-/* Lens — beautiful blue WALL-E eyes */
-.wel{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 32% 28%,#D0EEFA,#5BB8E8 45%,#1867A8 80%,#0A3560 100%);animation:walleLens 2.8s ease-in-out infinite;position:relative}
-.wel::after{content:'';position:absolute;width:4px;height:4px;background:rgba(255,255,255,.88);border-radius:50%;top:2px;right:2px}
+/* ── Silver mechanical arms ── */
+/* Each arm is an absolutely positioned container, rotates from top (shoulder) */
+.rv-arm{position:absolute;width:14px;height:66px;transform-origin:top center}
+.rv-arm.l{bottom:76px;left:4px;animation:rvArmLIdle 3s ease-in-out infinite}
+.rv-arm.r{bottom:76px;right:4px;animation:rvArmRIdle 3s ease-in-out infinite .7s}
+/* Shoulder ball joint */
+.rv-shoulder{position:absolute;top:0;left:50%;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 28%,#E8E8E8,#9A9A9A);border:1.5px solid #777;box-shadow:0 2px 4px rgba(0,0,0,.3)}
+/* Upper arm segment */
+.rv-ua{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:9px;height:24px;background:linear-gradient(to right,#D6D6D6,#A8A8A8,#D6D6D6);border-radius:4px;border:1px solid #888;box-shadow:1px 0 0 rgba(255,255,255,.35),-1px 0 0 rgba(0,0,0,.2)}
+/* Elbow joint */
+.rv-elbow{position:absolute;top:32px;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 28%,#E0E0E0,#888);border:1.5px solid #777;box-shadow:0 2px 3px rgba(0,0,0,.3)}
+/* Forearm segment */
+.rv-fa{position:absolute;top:41px;left:50%;transform:translateX(-50%);width:8px;height:18px;background:linear-gradient(to right,#D6D6D6,#A8A8A8,#D6D6D6);border-radius:4px;border:1px solid #888;box-shadow:1px 0 0 rgba(255,255,255,.3),-1px 0 0 rgba(0,0,0,.18)}
+/* Claw / gripper */
+.rv-claw{position:absolute;top:57px;left:50%;transform:translateX(-50%);width:18px;height:10px;display:flex;justify-content:space-between;align-items:flex-start}
+.rv-cp{width:7px;height:11px;background:linear-gradient(#CECECE,#888);border-radius:0 0 4px 4px;border:1px solid #777;box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.rv-cp.l{transform:rotate(-16deg);transform-origin:top center}
+.rv-cp.r{transform:rotate(16deg);transform-origin:top center}
+
+/* ── Talking state overrides ── */
+.rv.talking .rv-arm.l{animation:rvArmLTalk .5s ease-in-out infinite!important}
+.rv.talking .rv-arm.r{animation:rvArmRTalk .44s ease-in-out infinite .22s!important}
+.rv.talking .rv-body{animation:rvBodyBob .42s ease-in-out infinite}
+.rv.talking .rv-head{animation:rvHeadNod .55s ease-in-out infinite}
+.rv.talking .rv-wheel{animation:rvWheelSpin 1s linear infinite}
 
 /* Mobile */
 @media(max-width:768px){
@@ -356,22 +387,34 @@ function Avatar({tasks}){
     <div className="av-wrap" onClick={speak} title="点击收听工作汇报">
       <div className="av-bubble">{bubble}</div>
       {ripple&&<div className="av-ripple"/>}
-      <div className="walle">
-        {/* Tracks */}
-        <div className="wt"><div className="wt-w l"/><div className="wt-w r"/></div>
+      <div className={`rv${talking?' talking':''}`}>
+        {/* Big Wheels */}
+        <div className="rv-wheel l"><div className="rv-hub"/><div className="rv-spoke h"/><div className="rv-spoke v"/></div>
+        <div className="rv-wheel r"><div className="rv-hub"/><div className="rv-spoke h"/><div className="rv-spoke v"/></div>
+        <div className="rv-axle"/>
+        {/* Left Arm */}
+        <div className="rv-arm l">
+          <div className="rv-shoulder"/><div className="rv-ua"/><div className="rv-elbow"/><div className="rv-fa"/>
+          <div className="rv-claw"><div className="rv-cp l"/><div className="rv-cp r"/></div>
+        </div>
+        {/* Right Arm */}
+        <div className="rv-arm r">
+          <div className="rv-shoulder"/><div className="rv-ua"/><div className="rv-elbow"/><div className="rv-fa"/>
+          <div className="rv-claw"><div className="rv-cp l"/><div className="rv-cp r"/></div>
+        </div>
         {/* Body */}
-        <div className="wb"><div className="wbp"><div className="wbpl r"/><div className="wbpl g"/></div></div>
+        <div className="rv-body"><div className="rv-bp"><div className="rv-led r"/><div className="rv-led g"/></div></div>
         {/* Head */}
-        <div className="wh">
-          <div className="wr l"/><div className="wr r"/>
-          {/* WALL-E binocular eyes */}
-          <div className={`we${tilt?' tilt':''}`}>
-            <div className="web"/>
-            <div className="weu"><div className="wei"><div className="wel"/></div></div>
-            <div className="weu"><div className="wei"><div className="wel"/></div></div>
+        <div className="rv-head">
+          <div className="rv-rv l"/><div className="rv-rv r"/>
+          {/* Binocular eyes */}
+          <div className={`rv-eyes${tilt?' tilt':''}`}>
+            <div className="rv-ebridge"/>
+            <div className="rv-eu"><div className="rv-iris"><div className="rv-lens"/></div></div>
+            <div className="rv-eu"><div className="rv-iris"><div className="rv-lens"/></div></div>
           </div>
           {/* Speaker VU bars */}
-          <div className="whs">{bars.map((h,i)=><div key={i} className="whsg" style={{height:`${h}px`}}/>)}</div>
+          <div className="rv-grille">{bars.map((h,i)=><div key={i} className="rv-bar" style={{height:`${h}px`}}/>)}</div>
         </div>
       </div>
     </div>
